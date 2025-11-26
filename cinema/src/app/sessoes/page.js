@@ -1,37 +1,47 @@
 export default function Sessoes(){
     return(
         <div className="min-h-[calc(100vh-110px)] w-full flex-col flex items-center">
-            <div className="flex mt-5 w-full justify-center">
-                <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">1</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
+            <div>
+                <div className="flex mt-5 w-full justify-center">
+                    <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
+                        <p className="font-bold text-2xl">1</p>
+                    </button>
+                    <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
 
-                <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">2</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
+                    <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
+                        <p className="font-bold text-2xl">2</p>
+                    </button>
+                    <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
 
-                <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">3</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
+                    <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
+                        <p className="font-bold text-2xl">3</p>
+                    </button>
+                    <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
 
-                <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">4</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
+                    <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
+                        <p className="font-bold text-2xl">4</p>
+                    </button>
+                    <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
 
-                <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">5</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
+                    <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
+                        <p className="font-bold text-2xl">5</p>
+                    </button>
+                    <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
 
-                <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">6</p>
-                </button>
+                    <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
+                        <p className="font-bold text-2xl">6</p>
+                    </button>
+                </div>
+                <div className="flex w-full justify-center">
+                    <div className="w-40 text-center font-bold">Sessões</div>
+                    <div className="w-40 text-center font-bold">Assentos</div>
+                    <div className="w-40 text-center font-bold">Ingressos</div>
+                    <div className="w-40 text-center font-bold">Bomboniere</div>
+                    <div className="w-40 text-center font-bold">Pagamento</div>
+                    <div className="w-40 text-center font-bold">Confirmação</div>
+                </div>
             </div>
-            <div className="flex w-full mt-10">
+            <div className="flex w-full mt-16">
                 <div className="flex w-[40%] ml-10">
                     <img src="/interestelar.jpeg" alt="" className="rounded-lg mb-4" />
                     <div className="ml-5">
