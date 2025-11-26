@@ -1,3 +1,4 @@
+import { CalendarClock, MapPinned } from "lucide-react";
 export default function Bomboniere() {
     return (
         <div className="min-h-[calc(100vh-110px)] w-full flex-col flex items-center">
@@ -64,6 +65,50 @@ export default function Bomboniere() {
                             <p className="font-bold mt-auto mb-2">Pipocas</p>
                         </div>
                     </button>
+                </div>
+
+                <div className="flex fixed bottom-0 w-full flex-col">
+                    <div className="border-t-2 border-[#545454] w-full flex"></div>
+                    <div className="mt-2 ml-8 mb-2 flex">
+                        <div className="flex flex-row">
+                            <div><img src="/interestelar.jpeg" alt="" className="h-[120px] rounded-md" /></div>
+                            <div className="ml-5">
+                                <p className="font-bold flex items-center">
+                                    Interestelar
+                                    <div className="bg-[#008000] rounded-lg w-6 h-6 flex items-center justify-center text-white font-bold ml-2">L</div>
+                                </p>
+                                <p className="text-sm text-[#545454]">Ficção</p>
+                                <p className="text-sm text-[#545454]">120min</p>
+                            </div>
+                        </div>
+
+                        <div className="border-r-2 border-[#545454] flex mr-3 ml-6"></div>
+
+                        <div className="flex flex-col">
+                            <p className="font-bold">Sessão</p>
+                            <p className="text-sm text-[#545454] flex items-center"><CalendarClock />02/10/2025 às 19h30</p>
+                            <p className="text-sm text-[#545454] flex items-center mt-1"><MapPinned />CineAJL, sala 1</p>
+                            <div className="flex mt-1">
+                                <div className="bg-[#a60301] rounded-lg w-7 h-6 flex items-center justify-center text-white font-bold mr-1">3D</div>
+                                <div className="bg-[#ffd900] rounded-lg w-8 h-6 flex items-center justify-center text-white font-bold">DUB</div>
+                            </div>
+                        </div>
+
+                        <div className="border-r-2 border-[#545454] flex mr-3 ml-6"></div>
+
+                        <div className="flex flex-col">
+                            <p className="font-bold">Assentos escolhidos</p>
+                            <p className="text-sm text-[#a60301]">C3</p>
+                        </div>
+
+                        <div className="border-r-2 border-[#545454] flex mr-3 ml-6"></div>
+
+                        <div className="flex flex-col">
+                            <p className="font-bold">Tipos de ingresso</p>
+                            <p className="text-sm">1x Sala 01 - Preço único R$13,00</p>
+                            <p className="text-sm text-[#00a44d] font-bold mt-2">Total R$13,00</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
