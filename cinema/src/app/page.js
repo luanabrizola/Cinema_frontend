@@ -1,6 +1,10 @@
 "use client"
 
+import { useState } from "react";
+
 export default function Page() {
+  const [selectedMovie, setSelectedMovie] = useState(null);
+
   const scrollLeft = () => {
     const container = document.getElementById("carrossel");
     if (container) container.scrollBy({ left: -400, behavior: "smooth" });
@@ -11,8 +15,67 @@ export default function Page() {
     if (container) container.scrollBy({ left: 400, behavior: "smooth" });
   };
 
+  // Lista de filmes (pode colocar mais depois)
+  const movies = [
+    {
+      id: 1,
+      title: "Interestelar",
+      genre: "Ficção",
+      time: "120min",
+      image: "/interestelar.jpeg",
+      description:
+        "Um épico espacial que explora buracos negros, viagem interestelar e a força do amor."
+    },
+  ];
+
+  const Modal = () => {
+    if (!selectedMovie) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50">
+        <div className="bg-[#ffd900] rounded-xl p-6 overflow-y-auto h-[90%] w-[80%] relative mt-5">
+
+          <button
+            onClick={() => setSelectedMovie(null)}
+            className="absolute top-3 right-3 bg-red-600 text-white px-3 py-1 rounded"
+          >
+            Fechar
+          </button>
+
+          <div className="flex gap-8 h-full">
+
+            <img
+              src={selectedMovie.image}
+              className="w-[360px] h-[600px] object-cover rounded-xl"
+            />
+
+            <div className="flex flex-col justify-start overflow-y-auto pr-4">
+
+              <h1 className="text-4xl font-bold text-black">
+                {selectedMovie.title}
+              </h1>
+
+              <p className="text-2xl font-semibold mt-3 text-black">
+                {selectedMovie.genre} • {selectedMovie.time}
+              </p>
+
+              <p className="mt-4 text-lg text-black">
+                {selectedMovie.description}
+              </p>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    );
+  };
+
   return (
     <>
+      <Modal />
+
       <style>{`
         #carrossel::-webkit-scrollbar {
           display: none;
@@ -39,14 +102,12 @@ export default function Page() {
           ◀
         </button>
 
-        <div
-          id="carrossel"
-          className="overflow-x-auto whitespace-nowrap"
-        >
+        <div id="carrossel" className="overflow-x-auto whitespace-nowrap">
           <div className="flex gap-10">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <div
                 key={i}
+                onClick={() => setSelectedMovie(movies[0])}
                 className="bg-[#ffd900] h-[550px] w-80 rounded-xl inline-block flex-shrink-0 cursor-pointer"
               >
                 <div className="overflow-hidden rounded-xl w-full h-[380px] flex justify-center mt-3">
