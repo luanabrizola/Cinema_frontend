@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Star, Accessibility, ArrowBigLeft, MoveRight} from "lucide-react";
+import { Star, Accessibility} from "lucide-react";
 
 export default function Assentos() {
 
@@ -106,9 +106,7 @@ export default function Assentos() {
             </div>
 
             <div className="w-full max-w-[1200px] mt-10 flex items-center gap-4">
-                <button className="w-12 h-12 rounded-full bg-black border-2 border-black flex items-center justify-center">
-                    <span className="text-3xl font-bold text-white"><ArrowBigLeft size={30}/></span>
-                </button>
+                <button className="rotate-180 bg-black text-white text-4xl w-12 h-12 rounded-full ml-10">➜</button>
                 <span className="text-xl font-bold">Comprar ingresso</span>
             </div>
 
@@ -140,7 +138,7 @@ export default function Assentos() {
                 <div className="w-[30%] border-l pl-6 flex flex-col">
 
                     <button className="bg-[#c30b04] hover:bg-[#a20702] text-white py-4 rounded-xl font-semibold text-lg flex items-center justify-center gap-3">
-                        Continuar para ingressos <MoveRight size={20} />
+                        Continuar para ingressos ➜
                     </button>
 
                     <div className="mt-8 flex flex-col gap-4 text-lg">
