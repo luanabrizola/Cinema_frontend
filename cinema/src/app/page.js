@@ -1,5 +1,6 @@
 "use client"
 
+import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 export default function Page() {
@@ -18,13 +19,18 @@ export default function Page() {
   const movies = [
     {
       id: 1,
-      title: "Interestelar",
-      genre: "Ficção",
-      time: "120min",
-      image: "/interestelar.jpeg",
-      description:
-        "Um épico espacial que explora buracos negros, viagem interestelar e a força do amor."
+      titulo: "Interestelar",
+      genero: "Ficção",
+      duracao: "120min",
+      imagem: "/interestelar.jpeg",
+      descricao:
+        "As reservas naturais da Terra estão chegando ao fim e um grupo de astronautas recebe a missão de verificar possíveis planetas para receberem a população mundial, possibilitando a continuação da espécie. Cooper é chamado para liderar o grupo e aceita a missão sabendo que pode nunca mais ver os filhos. Ao lado de Brand, Jenkins e Doyle, ele seguirá em busca de um novo lar.",
+      sessao1: "15h30 – Sala 1 | Dublado | 2D",
+      sessao2: "15h30 – Sala 1 | Dublado | 2D",
+      direcao: "Christopher Nolan",
+      elenco: "Matthew McConaughey, Anne Hathaway, Michael Caine",
     },
+
   ];
 
   const Modal = () => {
@@ -36,31 +42,81 @@ export default function Page() {
 
           <button
             onClick={() => setSelectedMovie(null)}
-            className="absolute top-3 right-3 bg-red-600 text-white px-3 py-1 rounded"
+            className="absolute top-3 right-3 bg-red-600 text-white px-3 py-1 rounded-full"
           >
-            Fechar
+            X
           </button>
 
           <div className="flex gap-8 h-full">
 
             <img
-              src={selectedMovie.image}
+              src={selectedMovie.imagem}
               className="w-[360px] h-[600px] object-cover rounded-xl"
             />
 
             <div className="flex flex-col justify-start overflow-y-auto pr-4">
+              <div className="flex">
+                <h1 className="text-4xl font-bold text-white">
+                  {selectedMovie.titulo}
+                </h1>
+                <div className="bg-[#008000] rounded-lg w-10 h-10 flex items-center justify-center text-xl text-white font-bold ml-2">L</div>
 
-              <h1 className="text-4xl font-bold text-black">
-                {selectedMovie.title}
-              </h1>
+              </div>
 
-              <p className="text-2xl font-semibold mt-3 text-black">
-                {selectedMovie.genre} • {selectedMovie.time}
+
+              <p className="text-2xl font-semibold mt-3 text-white">
+                {selectedMovie.genero} • {selectedMovie.duracao}
               </p>
 
-              <p className="mt-4 text-lg text-black">
-                {selectedMovie.description}
+              <p className="mt-4 text-white mb-3">
+                {selectedMovie.descricao}
               </p>
+
+              <div className="mt-2 flex ">
+                <ChevronRight size={30} color="white"></ChevronRight>
+                <p className="text-white font-bold text-2xl">Sessões</p>
+              </div>
+              <p className="text-white ml-5 mt-1">
+                {selectedMovie.sessao1}
+              </p>
+              <p className="text-white ml-5 mt-1">
+                {selectedMovie.sessao2}
+              </p>
+
+              <div className="flex items-start gap-6 mt-5 text-white">
+
+                <div className="flex flex-col justify-center items-center">
+                  <p className="font-bold">Direção</p>
+                  <p>{selectedMovie.direcao}</p>
+                </div>
+
+                <div className="w-px h-10 bg-white/40"></div>
+
+                <div className="flex flex-col justify-center items-center">
+                  <p className="font-bold">Elenco</p>
+                  <p>{selectedMovie.elenco}</p>
+                </div>
+
+                <div className="w-px h-10 bg-white/40"></div>
+
+                <div className="flex flex-col justify-center items-center">
+                  <p className="font-bold">Duração</p>
+                  <p>{selectedMovie.duracao}</p>
+                </div>
+
+                <div className="w-px h-10 bg-white/40 "></div>
+
+                <div className="flex flex-col justify-center items-center">
+                  <p className="font-bold">Gênero</p>
+                  <p>{selectedMovie.genero}</p>
+                </div>
+              </div>
+              <a
+                href="/sessoes"
+                className="bg-[#a60301] w-[200px] h-[50px] rounded-2xl text-white font-bold flex items-center justify-center self-end mt-2"
+              >
+                Comprar ingresso
+              </a>
 
             </div>
           </div>
