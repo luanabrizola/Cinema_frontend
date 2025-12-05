@@ -15,7 +15,6 @@ export default function Page() {
     if (container) container.scrollBy({ left: 400, behavior: "smooth" });
   };
 
-  // Lista de filmes (pode colocar mais depois)
   const movies = [
     {
       id: 1,

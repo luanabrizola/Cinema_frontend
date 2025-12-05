@@ -1,9 +1,15 @@
-import { User, Lock } from "lucide-react";
+import { User, Lock, ChevronLeft } from "lucide-react";
 
 export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#a60301]">
       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md flex flex-col items-center">
+        <a
+          href="/"
+          className="bg-[#ffd900] h-8 w-8 rounded-full flex items-center justify-center self-start"
+        >
+          <ChevronLeft size={20} />
+        </a>
        <img
           src="/logo.png"
           className="h-20 w-auto"
