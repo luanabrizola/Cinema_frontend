@@ -406,7 +406,7 @@ export default function Bomboniere() {
 
             {/* BARRA INFERIOR */}
             <div className="flex fixed bottom-0 w-full flex-col bg-white">
-                <div className="border-t-2 border-[#545454] w-full flex"></div>
+                <div className="border-t border-[#a6a6a6] w-full flex"></div>
 
                 <div className="mt-4 ml-2 sm:ml-8 mb-2 flex flex-wrap">
 
@@ -432,7 +432,7 @@ export default function Bomboniere() {
                         </div>
                     </div>
 
-                    <div className="border-r-2 border-[#545454] h-20 flex mr-3 ml-6"></div>
+                    <div className="border-r border-[#a6a6a6] h-24 flex mr-3 ml-6 self-center"></div>
 
                     {/* SESSÃO */}
                     <div className="flex flex-col">
@@ -455,7 +455,7 @@ export default function Bomboniere() {
                         </div>
                     </div>
 
-                    <div className="border-r-2 border-[#545454] h-20 flex mr-3 ml-6"></div>
+                    <div className="border-r border-[#a6a6a6] h-24 flex mr-3 ml-6 self-center"></div>
 
                     {/* ASSENTOS */}
                     <div className="flex flex-col">
@@ -463,7 +463,7 @@ export default function Bomboniere() {
                         <p className="text-sm text-[#a60301]">C3</p>
                     </div>
 
-                    <div className="border-r-2 border-[#545454] h-20 flex mr-3 ml-6"></div>
+                    <div className="border-r border-[#a6a6a6] h-24 flex mr-3 ml-6 self-center"></div>
 
                     {/* INGRESSOS */}
                     <div className="flex flex-col">
