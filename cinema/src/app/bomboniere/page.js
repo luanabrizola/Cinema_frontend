@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { CalendarClock, MapPinned } from "lucide-react";
+import { CalendarClock, MapPinned, Search } from "lucide-react";
 
 export default function Bomboniere() {
     const [categoria, setCategoria] = useState(null);
@@ -11,6 +11,8 @@ export default function Bomboniere() {
     const pegarNumero = (valor) => {
         return Number(valor.replace("R$", "").replace(",", ".").trim());
     };
+
+    const [busca, setBusca] = useState("");
 
     const bebidas = [
         {
@@ -52,6 +54,21 @@ export default function Bomboniere() {
             imagem: "/pipocagrande.webp"
         }
     ];
+
+    const removerAcentos = (texto) => {
+        return texto
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase();
+    };
+
+    const bebidasFiltradas = bebidas.filter((item) =>
+        removerAcentos(item.nome).includes(removerAcentos(busca))
+    );
+
+    const pipocasFiltradas = pipocas.filter((item) =>
+        removerAcentos(item.nome).includes(removerAcentos(busca))
+    );
 
     const totalBebidas = bebidas.reduce(
         (total, item) =>
@@ -174,13 +191,23 @@ export default function Bomboniere() {
                     <div className="flex border border-[#d9d9d9] h-auto rounded-xl mt-3 sm:ml-10 sm:mr-20 w-full flex-col overflow-x-auto">
 
                         <div className="grid grid-cols-[35%_1fr_1fr_1fr] min-w-[600px] w-full items-center px-4">
-                            <input className="w-[30%] border h-8 px-2" />
+                            <div className="relative w-[80%] mt-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a6a6a6] w-4 h-4" />
+                                <input
+                                    value={busca}
+                                    onChange={(e) => setBusca(e.target.value)}
+                                    className="w-full border border-[#d9d9d9] h-8 pl-10 pr-3 rounded-[50px]"
+                                    placeholder="Encontre um produto"
+                                />
+                            </div>
+
+
                             <p className="font-bold text-center">Preço</p>
                             <p className="font-bold text-center">Quantidade</p>
                             <p className="font-bold text-center">Subtotal</p>
                         </div>
 
-                        {bebidas.map((item) => (
+                        {bebidasFiltradas.map((item) => (
                             <div
                                 key={item.id}
                                 className="grid grid-cols-[35%_1fr_1fr_1fr] min-w-[600px] w-full items-center px-4"
@@ -285,13 +312,21 @@ export default function Bomboniere() {
                     <div className="flex border border-[#d9d9d9] h-auto rounded-xl mt-3 sm:ml-10 sm:mr-20 w-full flex-col overflow-x-auto">
 
                         <div className="grid grid-cols-[35%_1fr_1fr_1fr] min-w-[600px] w-full items-center px-4">
-                            <input className="w-[30%] border h-8 px-2" />
+                            <div className="relative w-[80%] mt-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a6a6a6] w-4 h-4" />
+                                <input
+                                    value={busca}
+                                    onChange={(e) => setBusca(e.target.value)}
+                                    className="w-full border border-[#d9d9d9] h-8 pl-10 pr-3 rounded-[50px]"
+                                    placeholder="Encontre um produto"
+                                />
+                            </div>
                             <p className="font-bold text-center">Preço</p>
                             <p className="font-bold text-center">Quantidade</p>
                             <p className="font-bold text-center">Subtotal</p>
                         </div>
 
-                        {pipocas.map((item) => (
+                        {pipocasFiltradas.map((item) => (
                             <div
                                 key={item.id}
                                 className="grid grid-cols-[35%_1fr_1fr_1fr] min-w-[600px] w-full items-center px-4"
