@@ -13,8 +13,10 @@ export default function RootLayout({ children }) {
 const hideMenu = ["/login", "/cadastro"].includes(pathname);
   return (
     <html lang="pt-br">
-      {!hideMenu && <Menu />}
-      <body>{children}</body>
+      <body>
+        {!hideMenu && <Menu />}
+        {children}
+      </body>
     </html>
   );
 }
