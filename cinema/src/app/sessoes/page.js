@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { CalendarClock, MapPinned } from "lucide-react";
 import Link from "next/link";
 
 export default function Sessoes() {
@@ -29,6 +30,10 @@ export default function Sessoes() {
         { id: 1, hora: "15:30", tipo: ["DUB", "2D"] },
         { id: 2, hora: "19:30", tipo: ["DUB", "2D"] }
     ];
+
+    const dataSelecionada = diaSelecionado !== null ? proximos7Dias[diaSelecionado] : null;
+
+    const dataFormatada = dataSelecionada ? `${dataSelecionada.dia}/${String(hoje.getMonth() + 1).padStart(2, "0")}/${hoje.getFullYear()}` : "";
 
 
     return (
@@ -70,6 +75,7 @@ export default function Sessoes() {
                 </Link>
             </div>
 
+            {/* COnteúdos da sessão */}
             <div className="flex w-full mt-16">
                 <div className="flex w-[40%] ml-10">
                     <img src="/interestelar.jpeg" alt="" className="rounded-lg mb-4" />
@@ -81,7 +87,6 @@ export default function Sessoes() {
                         <p className="">Ficção</p>
                         <p className="">120min</p>
                     </div>
-
                 </div>
                 <div className="flex flex-col w-[60%]">
                     <h1 className="font-bold text-xl">Escolha uma sessão</h1>
@@ -116,8 +121,8 @@ export default function Sessoes() {
                                 key={horario.id}
                                 onClick={() => setHorarioSelecionado(horario.hora)}
                                 className={`flex w-[20%] h-[80%] rounded-xl items-center justify-center flex-col ml-10 cursor-pointer transition-all ${horarioSelecionado === horario.hora
-                                        ? "border border-[#a6a6a6] scale-105"
-                                        : ""
+                                    ? "border border-[#a6a6a6] scale-105"
+                                    : ""
                                     }`}
                             >
                                 <p>{horario.hora}</p>
@@ -138,6 +143,65 @@ export default function Sessoes() {
                     </div>
                 </div>
             </div>
+
+            {/* Rodapé */}
+            {diaSelecionado !== null && horarioSelecionado !== null && (
+                <div className="flex fixed bottom-0 w-full flex-col bg-white">
+                    <div className="border-t border-[#a6a6a6] w-full flex"></div>
+
+                    <div className="mt-4 ml-2 sm:ml-8 mb-2 flex flex-wrap">
+
+                        {/* FILME */}
+                        <div className="flex flex-row">
+                            <div>
+                                <img
+                                    src="/interestelar.jpeg"
+                                    alt=""
+                                    className="h-[90px] sm:h-[120px] rounded-md"
+                                />
+                            </div>
+
+                            <div className="ml-5">
+                                <p className="font-bold flex items-center">
+                                    Interestelar
+                                    <div className="bg-[#008000] rounded-lg w-6 h-6 flex items-center justify-center text-white font-bold ml-2">
+                                        L
+                                    </div>
+                                </p>
+                                <p className="text-sm text-[#545454]">Ficção</p>
+                                <p className="text-sm text-[#545454]">120min</p>
+                            </div>
+                        </div>
+
+                        <div className="border-r border-[#a6a6a6] h-24 flex mr-3 ml-6 self-center"></div>
+
+                        {/* SESSÃO */}
+                        <div className="flex flex-col">
+                            <p className="font-bold">Sessão</p>
+
+                            <p className="text-sm text-[#545454] flex items-center">
+                                <CalendarClock className="w-4 h-4 mr-1" />
+                                {dataFormatada} às {horarioSelecionado}
+                            </p>
+
+                            <p className="text-sm text-[#545454] flex items-center mt-1">
+                                <MapPinned className="w-4 h-4 mr-1" />
+                                CineAJL, sala 1
+                            </p>
+
+                            <div className="flex mt-1">
+                                <div className="bg-[#a60301] rounded-lg w-7 h-6 flex items-center justify-center text-white font-bold mr-1">
+                                    3D
+                                </div>
+                                <div className="bg-[#ffd900] rounded-lg w-8 h-6 flex items-center justify-center text-white font-bold">
+                                    DUB
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     )
 }
