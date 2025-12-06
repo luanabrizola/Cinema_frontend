@@ -2,43 +2,37 @@ import Link from "next/link"
 export default function Pagamento() {
     return (
         <div className="min-h-[calc(100vh-110px)] w-full flex flex-col items-center">
-            <div className="flex mt-5 w-full justify-center">
-                <button className="flex bg-[#a60301]/50 text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">1</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
+            {/* ETAPAS */}
+            <div className="flex mt-5 w-full justify-center flex-wrap gap-y-2">
 
-                <button className="flex bg-[#a60301]/50 text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">2</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
+                {[1, 2, 3, 4, 5, 6].map((n, i) => (
+                    <>
+                        <button
+                            key={n}
+                            className={`flex text-white w-9 h-9 sm:w-[50px] sm:h-[50px] lg:w-[60px] lg:h-[60px] rounded-xl items-center justify-center font-bold ${n <= 4 ? "bg-[#a60301]/50" : "bg-[#a60301]"}`}
+                        >
+                            <p className="font-bold text-base sm:text-xl lg:text-2xl">{n}</p>
+                        </button>
 
-                <button className="flex bg-[#a60301]/50 text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">3</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
+                        {n < 6 && (
+                            <div
+                                className="border-t-2 border-[#545454]
+                w-[35px] sm:w-[70px] lg:w-[100px]
+                flex self-center"
+                            ></div>
+                        )}
+                    </>
+                ))}
 
-                <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">4</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
-
-                <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">5</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
-
-                <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">6</p>
-                </button>
             </div>
-            <div className="flex w-full justify-center">
-                <div className="w-40 text-center font-bold">Sessões</div>
-                <div className="w-40 text-center font-bold">Assentos</div>
-                <div className="w-40 text-center font-bold">Ingressos</div>
-                <div className="w-40 text-center font-bold">Bomboniere</div>
-                <div className="w-40 text-center font-bold">Pagamento</div>
-                <div className="w-40 text-center font-bold">Confirmação</div>
+
+            {/* TÍTULOS */}
+            <div className="flex w-full justify-center overflow-x-auto">
+                {["Sessões", "Assentos", "Ingressos", "Bomboniere", "Pagamento", "Confirmação"].map((t) => (
+                    <div key={t} className="w-[90px] sm:w-40 text-center font-bold text-xs sm:text-base">
+                        {t}
+                    </div>
+                ))}
             </div>
 
             <div className="w-full max-w-[1200px] mt-10 flex items-center gap-4">

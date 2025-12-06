@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react"
 import { CalendarClock, MapPinned } from "lucide-react";
+import Link from "next/link";
 
 export default function Ingressos() {
 
@@ -15,54 +16,51 @@ export default function Ingressos() {
     const total = subtotalMeia + subtotalInteira
 
     return (
-        <div className="min-h-[calc(100vh-110px)] w-full flex-col flex items-center">
+        <div className="min-h-[calc(100vh-110px)] w-full flex-col flex items-center px-2 sm:px-4">
 
-            <div className="flex mt-5 w-full justify-center">
-                <button className="flex bg-[#a60301]/50 text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">1</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
+            {/* ETAPAS */}
+            <div className="flex mt-5 w-full justify-center flex-wrap gap-y-2">
 
-                <button className="flex bg-[#a60301]/50 text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">2</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
+                {[1, 2, 3, 4, 5, 6].map((n, i) => (
+                    <>
+                        <button
+                            key={n}
+                            className={`flex text-white w-9 h-9 sm:w-[50px] sm:h-[50px] lg:w-[60px] lg:h-[60px] rounded-xl items-center justify-center font-bold ${n <= 2 ? "bg-[#a60301]/50" : "bg-[#a60301]"}`}
+                        >
+                            <p className="font-bold text-base sm:text-xl lg:text-2xl">{n}</p>
+                        </button>
 
-                <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">3</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
+                        {n < 6 && (
+                            <div
+                                className="border-t-2 border-[#545454]
+                w-[35px] sm:w-[70px] lg:w-[100px]
+                flex self-center"
+                            ></div>
+                        )}
+                    </>
+                ))}
 
-                <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">4</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
-
-                <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">5</p>
-                </button>
-                <div className="border-t-2 border-[#545454] w-[100px] flex self-center"></div>
-
-                <button className="flex bg-[#a60301] text-white w-[60px] h-[60px] rounded-xl items-center justify-center font-bold">
-                    <p className="font-bold text-2xl">6</p>
-                </button>
             </div>
 
-            <div className="flex w-full justify-center">
-                <div className="w-40 text-center font-bold">Sessões</div>
-                <div className="w-40 text-center font-bold">Assentos</div>
-                <div className="w-40 text-center font-bold">Ingressos</div>
-                <div className="w-40 text-center font-bold">Bomboniere</div>
-                <div className="w-40 text-center font-bold">Pagamento</div>
-                <div className="w-40 text-center font-bold">Confirmação</div>
+            {/* TÍTULOS */}
+            <div className="flex w-full justify-center overflow-x-auto">
+                {["Sessões", "Assentos", "Ingressos", "Bomboniere", "Pagamento", "Confirmação"].map((t) => (
+                    <div key={t} className="w-[90px] sm:w-40 text-center font-bold text-xs sm:text-base">
+                        {t}
+                    </div>
+                ))}
             </div>
 
             <div className="flex flex-col w-full mt-4">
                 <div className="flex justify-between w-full">
-                    <button className="rotate-180 bg-black text-white text-4xl w-12 h-12 rounded-full ml-10">➜</button>
-                    <button className="bg-[#a60301] text-white font-bold w-[18%] h-12 rounded-full mr-10">
-                        Continuar para Bomboniere
-                    </button>
+                    <Link href="/assentos" className="flex items-center justify-center">
+                        <button className="rotate-180 bg-black text-white text-4xl w-12 h-12 rounded-full ml-10 cursor-pointer transition-all duration-200 hover:scale-105 hover:bg-black/80">➜</button>
+                    </Link>
+                    <Link href="/bomboniere" className="mr-10 w-[18%]">
+                        <button className="bg-[#a60301] text-white font-bold w-full h-12 rounded-full mr-10 cursor-pointer transition-all duration-200 hover:bg-[#c90401] hover:scale-105">
+                            Continuar para bomboniere
+                        </button>
+                    </Link>
                 </div>
 
                 <h1 className="font-bold text-xl ml-[15%]">Escolha o tipo do ingresso:</h1>
@@ -139,8 +137,8 @@ export default function Ingressos() {
 
                 </div>
 
-                 <div className="flex fixed bottom-0 w-full flex-col">
-                    <div className="border-t-2 border-[#545454] w-full flex"></div>
+                <div className="flex fixed bottom-0 w-full flex-col">
+                    <div className="border-t border-[#a6a6a6] w-full flex"></div>
                     <div className="mt-2 ml-8 mb-2 flex">
                         <div className="flex flex-row">
                             <div><img src="/interestelar.jpeg" alt="" className="h-[120px] rounded-md" /></div>
@@ -154,7 +152,7 @@ export default function Ingressos() {
                             </div>
                         </div>
 
-                        <div className="border-r-2 border-[#545454] flex mr-3 ml-6"></div>
+                        <div className="border-r border-[#a6a6a6] flex mr-3 ml-6"></div>
 
                         <div className="flex flex-col">
                             <p className="font-bold">Sessão</p>
@@ -166,14 +164,14 @@ export default function Ingressos() {
                             </div>
                         </div>
 
-                        <div className="border-r-2 border-[#545454] flex mr-3 ml-6"></div>
+                        <div className="border-r border-[#a6a6a6] flex mr-3 ml-6"></div>
 
                         <div className="flex flex-col">
                             <p className="font-bold">Assentos escolhidos</p>
                             <p className="text-sm text-[#a60301]">C3</p>
                         </div>
 
-                        <div className="border-r-2 border-[#545454] flex mr-3 ml-6"></div>
+                        <div className="border-r border-[#a6a6a6] flex mr-3 ml-6"></div>
 
                         <div className="flex flex-col">
                             <p className="font-bold">Tipos de ingresso</p>

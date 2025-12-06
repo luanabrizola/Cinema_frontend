@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { CalendarClock, MapPinned, Search } from "lucide-react";
+import Link from "next/link";
 
 export default function Bomboniere() {
     const [categoria, setCategoria] = useState(null);
@@ -123,14 +124,17 @@ export default function Bomboniere() {
 
             {/* BOTÕES TOPO */}
             <div className="flex flex-wrap justify-between w-full mt-4 gap-3">
-                <button className="rotate-180 bg-black text-white text-4xl w-12 h-12 rounded-full ml-10 cursor-pointer transition-all duration-200 hover:bg-[#a60301] hover:scale-105">
-                    ➜
-                </button>
+                <Link href="/ingressos">
+                    <button className="rotate-180 bg-black text-white text-4xl w-12 h-12 rounded-full ml-10 cursor-pointer transition-all duration-200 hover:bg-[#a60301] hover:scale-105">
+                        ➜
+                    </button>
+                </Link>
 
-
-                <button className="bg-[#a60301] text-white font-bold w-[18%] h-12 rounded-full mr-10 cursor-pointer transition-all duration-200 hover:bg-[#c90401] hover:scale-105">
-                    Continuar para pagamento
-                </button>
+                <Link href="/pagamento" className="mr-10 w-[18%]">
+                    <button className="bg-[#a60301] text-white font-bold w-full h-12 rounded-full mr-10 cursor-pointer transition-all duration-200 hover:bg-[#c90401] hover:scale-105">
+                        Continuar para pagamento
+                    </button>
+                </Link>
 
             </div>
 
