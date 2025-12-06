@@ -125,7 +125,7 @@ export default function Bomboniere() {
             {/* BOTÕES TOPO */}
             <div className="flex flex-wrap justify-between w-full mt-4 gap-3">
                 <Link href="/ingressos">
-                    <button className="rotate-180 bg-black text-white text-4xl w-12 h-12 rounded-full ml-10 cursor-pointer transition-all duration-200 hover:bg-[#a60301] hover:scale-105">
+                    <button className="rotate-180 bg-black text-white text-4xl w-12 h-12 rounded-full ml-10 cursor-pointer transition-all duration-200 hover:bg-black/80 hover:scale-105">
                         ➜
                     </button>
                 </Link>
