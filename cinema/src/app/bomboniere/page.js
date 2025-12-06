@@ -280,7 +280,7 @@ export default function Bomboniere() {
                             </div>
 
                             <div className="flex items-center justify-center font-bold text-lg">
-                                <div className="text-center w-[50%] font-bold text-lg bg-[#7ed957]/58 rounded-md">
+                                <div className="text-center w-[50%] font-bold text-lg bg-[#7ed957]/58 rounded-full">
                                     R$ {totalGeral.toFixed(2).replace(".", ",")}
                                 </div>
                             </div>
@@ -399,7 +399,7 @@ export default function Bomboniere() {
                             </div>
 
                             <div className="flex items-center justify-center font-bold text-lg">
-                                <div className="text-center w-[50%] font-bold text-lg bg-[#7ed957]/58 rounded-md">
+                                <div className="text-center w-[50%] font-bold text-lg bg-[#7ed957]/58 rounded-full">
                                     R$ {totalGeral.toFixed(2).replace(".", ",")}
                                 </div>
                             </div>
