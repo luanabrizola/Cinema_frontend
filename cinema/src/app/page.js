@@ -1,10 +1,27 @@
 "use client"
 
 import { ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Page() {
+  const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
+
+  useEffect(() => {
+    async function carregarFilmes() {
+      try {
+        const res = await fetch("http://localhost:3333/filme");
+        const data = await res.json();
+
+        setMovies(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Erro ao carregar filmes:", error);
+        setMovies([]);
+      }
+    }
+
+    carregarFilmes();
+  }, []);
 
   const scrollLeft = () => {
     const container = document.getElementById("carrossel");
@@ -16,22 +33,6 @@ export default function Page() {
     if (container) container.scrollBy({ left: 400, behavior: "smooth" });
   };
 
-  const movies = [
-    {
-      id: 1,
-      titulo: "Interestelar",
-      genero: "Ficção",
-      duracao: "120min",
-      imagem: "/interestelar.jpeg",
-      descricao:
-        "As reservas naturais da Terra estão chegando ao fim e um grupo de astronautas recebe a missão de verificar possíveis planetas para receberem a população mundial, possibilitando a continuação da espécie. Cooper é chamado para liderar o grupo e aceita a missão sabendo que pode nunca mais ver os filhos. Ao lado de Brand, Jenkins e Doyle, ele seguirá em busca de um novo lar.",
-      sessao1: "15h30 – Sala 1 | Dublado | 2D",
-      sessao2: "15h30 – Sala 1 | Dublado | 2D",
-      direcao: "Christopher Nolan",
-      elenco: "Matthew McConaughey, Anne Hathaway, Michael Caine",
-    },
-
-  ];
 
   const Modal = () => {
     if (!selectedMovie) return null;
@@ -50,80 +51,68 @@ export default function Page() {
           <div className="flex gap-8 h-full">
 
             <img
-              src={selectedMovie.imagem}
-              className="w-[360px] h-[600px] object-cover rounded-xl"
+              src={`http://localhost:3333/${selectedMovie.foto_capa}`}
+              className="w-[360px] h-[500px] object-cover rounded-xl"
             />
 
             <div className="flex flex-col justify-start overflow-y-auto pr-4">
-              <div className="flex">
+              <div className="flex items-center gap-3">
                 <h1 className="text-4xl font-bold text-white">
-                  {selectedMovie.titulo}
+                  {selectedMovie.nome_filme}
                 </h1>
-                <div className="bg-[#008000] rounded-lg w-10 h-10 flex items-center justify-center text-xl text-white font-bold ml-2">L</div>
 
+                <div className="bg-[#008000] rounded-lg p-2 h-10 flex items-center justify-center text-xl text-white font-bold">
+                  {selectedMovie.classificacao || "L"}
+                </div>
               </div>
 
-
               <p className="text-2xl font-semibold mt-3 text-white">
-                {selectedMovie.genero} • {selectedMovie.duracao}
+                {selectedMovie.genero} • {selectedMovie.duracao} min
               </p>
 
               <p className="mt-4 text-white mb-3">
-                {selectedMovie.descricao}
+                {selectedMovie.sinopse}
               </p>
 
-              <div className="mt-2 flex ">
-                <ChevronRight size={30} color="white"></ChevronRight>
+              <div className="mt-2 flex items-center gap-2">
+                <ChevronRight size={30} color="white" />
                 <p className="text-white font-bold text-2xl">Sessões</p>
               </div>
-              <p className="text-white ml-5 mt-1">
-                {selectedMovie.sessao1}
-              </p>
-              <p className="text-white ml-5 mt-1">
-                {selectedMovie.sessao2}
-              </p>
+
+              <p className="text-white ml-5 mt-1">Sala 1 — 15h30</p>
+              <p className="text-white ml-5 mt-1">Sala 1 — 20h00</p>
 
               <div className="flex items-start gap-6 mt-5 text-white">
-
-                <div className="flex flex-col justify-center items-center">
-                  <p className="font-bold">Direção</p>
-                  <p>{selectedMovie.direcao}</p>
+                <div className="flex flex-col items-center">
+                  <p className="font-bold">Ano</p>
+                  <p>{selectedMovie.ano_lancamento}</p>
                 </div>
 
                 <div className="w-px h-10 bg-white/40"></div>
 
-                <div className="flex flex-col justify-center items-center">
-                  <p className="font-bold">Elenco</p>
-                  <p>{selectedMovie.elenco}</p>
-                </div>
-
-                <div className="w-px h-10 bg-white/40"></div>
-
-                <div className="flex flex-col justify-center items-center">
+                <div className="flex flex-col items-center">
                   <p className="font-bold">Duração</p>
-                  <p>{selectedMovie.duracao}</p>
+                  <p>{selectedMovie.duracao} min</p>
                 </div>
 
-                <div className="w-px h-10 bg-white/40 "></div>
+                <div className="w-px h-10 bg-white/40"></div>
 
-                <div className="flex flex-col justify-center items-center">
-                  <p className="font-bold">Gênero</p>
-                  <p>{selectedMovie.genero}</p>
+                <div className="flex flex-col items-center">
+                  <p className="font-bold">Classificação</p>
+                  <p>{selectedMovie.classificacao}</p>
                 </div>
               </div>
+
               <a
                 href="/sessoes"
                 className="bg-[#a60301] w-[200px] h-[50px] rounded-2xl text-white font-bold flex items-center justify-center self-end mt-2"
               >
                 Comprar ingresso
               </a>
-
             </div>
           </div>
-
         </div>
       </div>
-
     );
   };
 
@@ -136,7 +125,7 @@ export default function Page() {
           display: none;
         }
         #carrossel {
-          -ms-overflow-style: none; 
+          -ms-overflow-style: none;
           scrollbar-width: none;
         }
       `}</style>
@@ -146,7 +135,7 @@ export default function Page() {
       </div>
 
       <div className="bg-[#ffd900] w-full h-20 text-white font-bold flex items-center justify-center text-xl">
-        Filmes em cartaz
+        Filmes em Cartaz
       </div>
 
       <div className="relative px-10 py-10">
@@ -159,33 +148,43 @@ export default function Page() {
 
         <div id="carrossel" className="overflow-x-auto whitespace-nowrap">
           <div className="flex gap-10">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div
-                key={i}
-                onClick={() => setSelectedMovie(movies[0])}
-                className="bg-[#ffd900] h-[550px] w-80 rounded-xl inline-block flex-shrink-0 cursor-pointer"
-              >
-                <div className="overflow-hidden rounded-xl w-full h-[380px] flex justify-center mt-3">
-                  <img
-                    src="/interestelar.jpeg"
-                    className="w-[260px] h-full object-cover"
-                  />
-                </div>
 
-                <p className="text-white font-bold text-3xl mt-2 ml-3">
-                  Interestelar
-                </p>
-
-                <div className="flex items-center gap-2 ml-3">
-                  <p className="text-white font-bold text-xl">Ficção</p>
-                  <div className="bg-[#008000] rounded-lg w-10 h-10 flex items-center justify-center text-xl text-white font-bold">
-                    L
+            {movies.length === 0 ? (
+              <p className="text-white text-xl">Carregando filmes...</p>
+            ) : (
+              movies.map((filme) => (
+                <div
+                  key={filme.id_filme}
+                  onClick={() => setSelectedMovie(filme)}
+                  className="bg-[#ffd900] h-[550px] w-80 rounded-xl inline-block flex-shrink-0 cursor-pointer"
+                >
+                  <div className="overflow-hidden rounded-xl w-full h-[380px] flex justify-center mt-3">
+                    <img
+                      src={`http://localhost:3333/${filme.foto_capa}`}
+                      className="w-[260px] h-full object-cover"
+                    />
                   </div>
-                </div>
 
-                <p className="text-white font-bold text-xl ml-3">120min</p>
-              </div>
-            ))}
+                  <p className="text-white font-bold text-3xl mt-2 ml-3">
+                    {filme.nome_filme}
+                  </p>
+
+                  <div className="flex items-center gap-3 ml-3 mt-1">
+                    <p className="text-white font-bold text-xl">
+                      {filme.genero}
+                    </p>
+                    <div className="bg-[#008000] rounded-lg p-2 h-10 flex items-center justify-center text-xl text-white font-bold">
+                      {filme.classificacao || "L"}
+                    </div>
+                  </div>
+
+                  <p className="text-white font-bold text-xl ml-3 mt-1">
+                    {filme.duracao} min
+                  </p>
+                </div>
+              ))
+            )}
+
           </div>
         </div>
 
