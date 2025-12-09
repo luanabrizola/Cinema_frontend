@@ -33,6 +33,28 @@ export default function Page() {
     if (container) container.scrollBy({ left: 400, behavior: "smooth" });
   };
 
+  const getClassColor = (classificacao) => {
+    if (!classificacao) return "#00A000";
+
+    const value = classificacao
+      .toString()
+      .trim()
+      .toUpperCase()
+      .replace(/\D/g, "");
+
+    const key = value === "" ? "L" : value;
+
+    const cores = {
+      "L": "#00A000",
+      "10": "#0072BB",
+      "12": "#E6B400",
+      "14": "#E65100",
+      "16": "#C62828",
+      "18": "#000000"
+    };
+
+    return cores[key] || "#00A000";
+  };
 
   const Modal = () => {
     if (!selectedMovie) return null;
@@ -61,9 +83,13 @@ export default function Page() {
                   {selectedMovie.nome_filme}
                 </h1>
 
-                <div className="bg-[#008000] rounded-lg p-2 h-10 flex items-center justify-center text-xl text-white font-bold">
-                  {selectedMovie.classificacao || "L"}
+                <div
+                  className="rounded-lg p-2 h-10 w-10 flex items-center justify-center text-xl text-white font-bold"
+                  style={{ backgroundColor: getClassColor(selectedMovie.classificacao) }}
+                >
+                  {(selectedMovie.classificacao && selectedMovie.classificacao.replace(/\D/g, "")) || "L"}
                 </div>
+
               </div>
 
               <p className="text-2xl font-semibold mt-3 text-white">
@@ -156,7 +182,7 @@ export default function Page() {
                 <div
                   key={filme.id_filme}
                   onClick={() => setSelectedMovie(filme)}
-                  className="bg-[#ffd900] h-[550px] w-80 rounded-xl inline-block flex-shrink-0 cursor-pointer"
+                  className="bg-[#ffd900] h-[550px] w-80 rounded-xl inline-block shrink-0 cursor-pointer"
                 >
                   <div className="overflow-hidden rounded-xl w-full h-[380px] flex justify-center mt-3">
                     <img
@@ -173,9 +199,13 @@ export default function Page() {
                     <p className="text-white font-bold text-xl">
                       {filme.genero}
                     </p>
-                    <div className="bg-[#008000] rounded-lg p-2 h-10 flex items-center justify-center text-xl text-white font-bold">
-                      {filme.classificacao || "L"}
+                    <div
+                      className="rounded-lg p-2 h-10 w-9 flex items-center justify-center text-xl text-white font-bold"
+                      style={{ backgroundColor: getClassColor(filme.classificacao) }}
+                    >
+                      {(filme.classificacao && filme.classificacao.replace(/\D/g, "")) || "L"}
                     </div>
+
                   </div>
 
                   <p className="text-white font-bold text-xl ml-3 mt-1">
