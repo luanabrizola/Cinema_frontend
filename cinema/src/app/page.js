@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -129,12 +130,13 @@ export default function Page() {
                 </div>
               </div>
 
-              <a
-                href="/sessoes"
+              <Link
                 className="bg-[#a60301] w-[200px] h-[50px] rounded-2xl text-white font-bold flex items-center justify-center self-end mt-2"
+                href={`/sessoes?id=${selectedMovie.id_filme}`}
               >
                 Comprar ingresso
-              </a>
+              </Link>
+
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { CalendarClock, MapPinned } from "lucide-react";
 import Link from "next/link";
 
@@ -35,6 +36,58 @@ export default function Sessoes() {
 
     const dataFormatada = dataSelecionada ? `${dataSelecionada.dia}/${String(hoje.getMonth() + 1).padStart(2, "0")}/${hoje.getFullYear()}` : "";
 
+    const [filme, setFilme] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    const searchParams = useSearchParams();
+    const id = searchParams.get("id");
+
+    useEffect(() => {
+        if (!id) return;
+
+        async function carregarFilme() {
+            try {
+                const res = await fetch(`http://localhost:3333/filme/${id}`);
+                const data = await res.json();
+
+                console.log("Filme carregado:", data);
+
+                setFilme(data);
+            } catch (error) {
+                console.error("Erro ao carregar filme:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        carregarFilme();
+    }, [id]);
+
+    if (loading) return <p>Carregando filme...</p>;
+    if (!filme) return <p>Filme não encontrado.</p>;
+
+    const getClassColor = (classificacao) => {
+        if (!classificacao) return "#00A000";
+
+        const value = classificacao
+            .toString()
+            .trim()
+            .toUpperCase()
+            .replace(/\D/g, "");
+
+        const key = value === "" ? "L" : value;
+
+        const cores = {
+            "L": "#00A000",
+            "10": "#0072BB",
+            "12": "#E6B400",
+            "14": "#E65100",
+            "16": "#C62828",
+            "18": "#000000"
+        };
+
+        return cores[key] || "#00A000";
+    };
 
     return (
         <div className="min-h-[calc(100vh-110px)] w-full flex-col flex items-center px-2 sm:px-4">
@@ -78,15 +131,29 @@ export default function Sessoes() {
             {/* COnteúdos da sessão */}
             <div className="flex w-full mt-16">
                 <div className="flex w-[40%] ml-10">
-                    <img src="/interestelar.jpeg" alt="" className="rounded-lg mb-4" />
+                    <img
+                        src={filme.foto_capa ? `http://localhost:3333/${filme.foto_capa}` : "/placeholder.jpg"}
+                        alt={filme.nome_filme}
+                        className="rounded-lg mb-4 w-40 h-auto object-cover"
+                    />
+
                     <div className="ml-5">
                         <p className="font-bold text-xl flex items-center">
-                            Interestelar
-                            <div className="bg-[#008000] rounded-lg w-8 h-8 flex items-center justify-center text-white font-bold ml-2">L</div>
+                            {filme.nome_filme}
+
+                            <div className="rounded-lg w-8 h-8 flex items-center justify-center text-white font-bold ml-2"
+                                style={{ backgroundColor: getClassColor(filme.classificacao) }}
+                            >
+                                {(filme.classificacao || "L").replace(/\D/g, "")}
+                            </div>
+
                         </p>
-                        <p className="">Ficção</p>
-                        <p className="">120min</p>
+
+                        <p>{filme.genero || "Gênero não informado"}</p>
+                        <p>{filme.duracao ? `${filme.duracao} min` : "Duração não informada"}</p>
                     </div>
+
+
                 </div>
                 <div className="flex flex-col w-[60%]">
                     <h1 className="font-bold text-xl">Escolha uma sessão</h1>
@@ -145,7 +212,7 @@ export default function Sessoes() {
             </div>
 
             {/* Rodapé */}
-            {diaSelecionado !== null && horarioSelecionado !== null && (
+            {diaSelecionado !== null && horarioSelecionado !== null && filme && (
                 <div className="flex fixed bottom-0 w-full flex-col bg-white">
                     <div className="border-t border-[#a6a6a6] w-full flex"></div>
 
@@ -155,21 +222,34 @@ export default function Sessoes() {
                         <div className="flex flex-row">
                             <div>
                                 <img
-                                    src="/interestelar.jpeg"
-                                    alt=""
-                                    className="h-[90px] sm:h-[120px] rounded-md"
+                                    src={
+                                        filme.foto_capa
+                                            ? `http://localhost:3333/${filme.foto_capa}`
+                                            : "/placeholder.jpg"
+                                    }
+                                    alt={filme.nome_filme}
+                                    className="h-[90px] sm:h-[120px] rounded-md object-cover"
                                 />
                             </div>
 
                             <div className="ml-5">
                                 <p className="font-bold flex items-center">
-                                    Interestelar
-                                    <div className="bg-[#008000] rounded-lg w-6 h-6 flex items-center justify-center text-white font-bold ml-2">
-                                        L
+                                    {filme.nome_filme}
+
+                                    <div className="rounded-lg w-8 h-8 flex items-center justify-center text-white font-bold ml-2"
+                                        style={{ backgroundColor: getClassColor(filme.classificacao) }}
+                                    >
+                                        {(filme.classificacao || "L").replace(/\D/g, "")}
                                     </div>
                                 </p>
-                                <p className="text-sm text-[#545454]">Ficção</p>
-                                <p className="text-sm text-[#545454]">120min</p>
+
+                                <p className="text-sm text-[#545454]">
+                                    {filme.genero || "Gênero não informado"}
+                                </p>
+
+                                <p className="text-sm text-[#545454]">
+                                    {filme.duracao ? `${filme.duracao} min` : "Duração não informada"}
+                                </p>
                             </div>
                         </div>
 
@@ -201,6 +281,7 @@ export default function Sessoes() {
                     </div>
                 </div>
             )}
+
 
         </div>
     )
