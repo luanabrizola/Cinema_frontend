@@ -193,10 +193,13 @@ export default function Assentos() {
                 </div>
 
                 <div className="w-[30%] border-l pl-6 flex flex-col">
-                    <Link href="/ingressos">
-                        <button className="bg-[#a60301] cursor-pointer hover:bg-[#c90401] text-white p-2 py-4 rounded-xl font-semibold text-lg flex items-center justify-center gap-3">
-                            Continuar para ingressos ➜
-                        </button>
+                    <Link
+                        href={{
+                            pathname: "/ingressos",
+                            query: { assentosSelecionados: selected.join(",") },
+                        }}
+                    >
+                        <button className="bg-[#a60301] cursor-pointer hover:bg-[#c90401] text-white p-2 py-4 rounded-xl font-semibold text-lg flex items-center justify-center gap-3 ">Continuar para ingressos ➜</button>
                     </Link>
 
                     <div className="mt-8 flex flex-col gap-4 text-lg">
@@ -299,6 +302,8 @@ export default function Assentos() {
                     </div>
                 </div>
             )}
+
+
 
 
 
