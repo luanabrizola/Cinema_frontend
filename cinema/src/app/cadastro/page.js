@@ -23,18 +23,16 @@ export default function Cadastro() {
     async function handleSubmit(e) {
         e.preventDefault();
 
-        // 1. Verifica se as senhas coincidem
         if (form.senha !== form.confirmarSenha) {
             alert("As senhas não coincidem!");
             return;
         }
 
-        // 2. Validações da senha
         const senha = form.senha;
-        const regexNumero = /\d/;           // pelo menos um número
-        const regexMaiuscula = /[A-Z]/;     // pelo menos uma letra maiúscula
-        const regexMinuscula = /[a-z]/;     // pelo menos uma letra minúscula
-        const regexEspecial = /[!@#$%^&*]/; // pelo menos um caractere especial
+        const regexNumero = /\d/;           
+        const regexMaiuscula = /[A-Z]/;    
+        const regexMinuscula = /[a-z]/;     
+        const regexEspecial = /[!@#$%^&*]/;
 
         if (senha.length < 8) {
             alert("A senha deve ter no mínimo 8 caracteres.");
@@ -59,6 +57,20 @@ export default function Cadastro() {
         if (!regexEspecial.test(senha)) {
             alert("A senha deve conter pelo menos um caractere especial (!@#$%^&*).");
             return;
+        }
+
+        const cpfNumeros = form.cpf.replace(/\D/g, '');
+        if (cpfNumeros.length !== 11) {
+            alert("O CPF deve conter exatamente 11 números.");
+            return;
+        }
+
+        if (form.telefone) {
+            const telefoneNumeros = form.telefone.replace(/\D/g, '');
+            if (telefoneNumeros.length < 10 || telefoneNumeros.length > 11) {
+                alert("O telefone deve conter 10 ou 11 números.");
+                return;
+            }
         }
 
         try {
