@@ -264,113 +264,113 @@ export default function Sessoes() {
                             <button
                                 key={horario.id}
                                 onClick={() => setHorarioSelecionado(horario)}
-                                className={`flex w-[20%] h-[80%] rounded-xl items-center justify-center flex-col ml-10 cursor-pointer transition-all ${horarioSelecionado === horario.hora
-                                    ? "border border-[#a6a6a6] scale-105"
-                                    : ""
+                                className={`flex w-[20%] h-[80%] rounded-xl items-center justify-center flex-col ml-10 cursor-pointer transition-all ${horarioSelecionado?.hora === horario.hora
+                                        ? "border border-[#a6a6a6] scale-105"
+                                        : ""
                                     }`}
-                            >
-                                <p>{horario.hora}</p>
+                                >
+                                    <p>{horario.hora}</p>
 
-                                <div className="flex w-full h-[50%] items-center justify-around">
-                                    {horario.tipo.map((tipo, index) => (
-                                        <div
-                                            key={index}
-                                            className="bg-[#ffd900] rounded-xl w-[40%] h-[90%] flex items-center justify-center text-white font-bold"
-                                        >
-                                            {tipo}
-                                        </div>
-                                    ))}
-                                </div>
-                            </button>
+                                    <div className="flex w-full h-[50%] items-center justify-around">
+                                        {horario.tipo.map((tipo, index) => (
+                                            <div
+                                                key={index}
+                                                className="bg-[#ffd900] rounded-xl w-[40%] h-[90%] flex items-center justify-center text-white font-bold"
+                                            >
+                                                {tipo}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </button>
                         ))}
 
 
-                    </div>
+                            </div>
                 </div>
+                </div>
+
+                {/* Rodapé */}
+                {diaSelecionado !== null && horarioSelecionado !== null && filme && (
+                    <div className="flex fixed bottom-0 w-full flex-col bg-white">
+                        <div className="border-t border-[#a6a6a6] w-full flex"></div>
+
+                        <div className="mt-4 ml-2 sm:ml-8 mb-2 flex flex-wrap">
+
+                            {/* FILME */}
+                            <div className="flex flex-row">
+                                <div>
+                                    <img
+                                        src={
+                                            filme.foto_capa
+                                                ? `http://localhost:3333/${filme.foto_capa}`
+                                                : "/placeholder.jpg"
+                                        }
+                                        alt={filme.nome_filme}
+                                        className="h-[90px] sm:h-[120px] rounded-md object-cover"
+                                    />
+                                </div>
+
+                                <div className="ml-5">
+                                    <p className="font-bold flex items-center">
+                                        {filme.nome_filme}
+
+                                        <div className="rounded-lg w-8 h-8 flex items-center justify-center text-white font-bold ml-2"
+                                            style={{ backgroundColor: getClassColor(filme.classificacao) }}
+                                        >
+                                            {(filme.classificacao || "L").replace(/\D/g, "")}
+                                        </div>
+                                    </p>
+
+                                    <p className="text-sm text-[#545454]">
+                                        {generoFilme || "Gênero não informado"}
+                                    </p>
+
+                                    <p className="text-sm text-[#545454]">
+                                        {filme.duracao ? `${filme.duracao} min` : "Duração não informada"}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="border-r border-[#a6a6a6] h-24 flex mr-3 ml-6 self-center"></div>
+
+                            {/* SESSÃO */}
+                            <div className="flex flex-col">
+                                <p className="font-bold">Sessão</p>
+
+                                <p className="text-sm text-[#545454] flex items-center">
+                                    <CalendarClock className="w-4 h-4 mr-1" />
+                                    {dataFormatada} às {horarioSelecionado.hora}
+
+                                </p>
+
+                                <p className="text-sm text-[#545454] flex items-center mt-1">
+                                    <MapPinned className="w-4 h-4 mr-1" />
+                                    CineAJL, sala 1
+                                </p>
+                                <div className="flex mt-1">
+                                    {horariosDoDia.map((h) => {
+                                        if (h.hora === horarioSelecionado.hora) {
+                                            const idiomaBadge = h.tipo[0].toLowerCase().includes("português") ? "DUB" : "LEG";
+                                            return (
+                                                <>
+                                                    <div className="bg-[#a60301] rounded-lg w-7 h-6 flex items-center justify-center text-white font-bold mr-1">
+                                                        {h.tipo[1]}
+                                                    </div>
+                                                    <div className="bg-[#ffd900] rounded-lg w-8 h-6 flex items-center justify-center text-white font-bold">
+                                                        {idiomaBadge}
+                                                    </div>
+                                                </>
+                                            );
+                                        }
+                                        return null;
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+
             </div>
-
-            {/* Rodapé */}
-            {diaSelecionado !== null && horarioSelecionado !== null && filme && (
-                <div className="flex fixed bottom-0 w-full flex-col bg-white">
-                    <div className="border-t border-[#a6a6a6] w-full flex"></div>
-
-                    <div className="mt-4 ml-2 sm:ml-8 mb-2 flex flex-wrap">
-
-                        {/* FILME */}
-                        <div className="flex flex-row">
-                            <div>
-                                <img
-                                    src={
-                                        filme.foto_capa
-                                            ? `http://localhost:3333/${filme.foto_capa}`
-                                            : "/placeholder.jpg"
-                                    }
-                                    alt={filme.nome_filme}
-                                    className="h-[90px] sm:h-[120px] rounded-md object-cover"
-                                />
-                            </div>
-
-                            <div className="ml-5">
-                                <p className="font-bold flex items-center">
-                                    {filme.nome_filme}
-
-                                    <div className="rounded-lg w-8 h-8 flex items-center justify-center text-white font-bold ml-2"
-                                        style={{ backgroundColor: getClassColor(filme.classificacao) }}
-                                    >
-                                        {(filme.classificacao || "L").replace(/\D/g, "")}
-                                    </div>
-                                </p>
-
-                                <p className="text-sm text-[#545454]">
-                                    {generoFilme || "Gênero não informado"}
-                                </p>
-
-                                <p className="text-sm text-[#545454]">
-                                    {filme.duracao ? `${filme.duracao} min` : "Duração não informada"}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="border-r border-[#a6a6a6] h-24 flex mr-3 ml-6 self-center"></div>
-
-                        {/* SESSÃO */}
-                        <div className="flex flex-col">
-                            <p className="font-bold">Sessão</p>
-
-                            <p className="text-sm text-[#545454] flex items-center">
-                                <CalendarClock className="w-4 h-4 mr-1" />
-                                {dataFormatada} às {horarioSelecionado.hora}
-
-                            </p>
-
-                            <p className="text-sm text-[#545454] flex items-center mt-1">
-                                <MapPinned className="w-4 h-4 mr-1" />
-                                CineAJL, sala 1
-                            </p>
-                            <div className="flex mt-1">
-                                {horariosDoDia.map((h) => {
-                                    if (h.hora === horarioSelecionado.hora) {
-                                        const idiomaBadge = h.tipo[0].toLowerCase().includes("português") ? "DUB" : "LEG";
-                                        return (
-                                            <>
-                                                <div className="bg-[#a60301] rounded-lg w-7 h-6 flex items-center justify-center text-white font-bold mr-1">
-                                                    {h.tipo[1]}
-                                                </div>
-                                                <div className="bg-[#ffd900] rounded-lg w-8 h-6 flex items-center justify-center text-white font-bold">
-                                                    {idiomaBadge}
-                                                </div>
-                                            </>
-                                        );
-                                    }
-                                    return null;
-                                })}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-
-        </div>
-    )
+            )
 }
