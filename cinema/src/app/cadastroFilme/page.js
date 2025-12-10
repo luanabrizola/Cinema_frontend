@@ -1,7 +1,10 @@
 "use client"
 import { useState } from "react";
+import { useRouter } from "next/navigation"; 
 
 export default function CadastroFilme() {
+    const router = useRouter(); 
+
     const [form, setForm] = useState({
         nome_filme: "",
         duracao: "",
@@ -35,11 +38,13 @@ export default function CadastroFilme() {
 
         const resposta = await fetch("http://localhost:3333/filme", {
             method: "POST",
-            body: data // sem headers!
+            body: data 
         });
 
         const resultado = await resposta.json();
         console.log(resultado);
+
+        router.push("/"); 
     }
 
     return (
