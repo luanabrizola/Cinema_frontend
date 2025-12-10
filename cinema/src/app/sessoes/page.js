@@ -16,6 +16,7 @@ export default function Sessoes() {
     const [diaSelecionado, setDiaSelecionado] = useState(null);
     const [horarioSelecionado, setHorarioSelecionado] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [generoFilme, setGeneroFilme] = useState(null);
 
     const searchParams = useSearchParams();
     const id = searchParams.get("id");
@@ -78,7 +79,8 @@ export default function Sessoes() {
         if (sessoes.length === 0) return;
 
         const dias = Array.from(new Set(sessoes.map(s => s.data))).map(dataStr => {
-            const data = new Date(dataStr);
+            const [year, month, day] = dataStr.split("-").map(Number);
+            const data = new Date(year, month - 1, day);
             return {
                 dia: String(data.getDate()).padStart(2, "0"),
                 semana: diasSemana[data.getDay()],
@@ -89,6 +91,34 @@ export default function Sessoes() {
         setDiasComSessao(dias);
         setDiaSelecionado(0);
     }, [sessoes]);
+
+    useEffect(() => {
+        if (!id) return;
+
+        async function carregarGenero() {
+            try {
+                const res = await fetch(`http://localhost:3333/genero-do-filme/filme/${id}`);
+                const data = await res.json();
+                console.log("Associação do gênero:", data);
+
+                if (data.length > 0) {
+                    const idGenero = data[0].id_genero;
+                    const resGenero = await fetch(`http://localhost:3333/genero/${idGenero}`);
+                    const generoData = await resGenero.json();
+                    console.log("Gênero real:", generoData);
+
+                    setGeneroFilme(generoData.nome_genero);
+                } else {
+                    setGeneroFilme("Gênero não informado");
+                }
+            } catch (error) {
+                console.error("Erro ao carregar gênero do filme:", error);
+            }
+        }
+
+        carregarGenero();
+    }, [id]);
+
 
     if (loading) return <p>Carregando filme...</p>;
     if (!filme) return <p>Filme não encontrado.</p>;
@@ -195,7 +225,7 @@ export default function Sessoes() {
 
                         </p>
 
-                        <p>{filme.genero || "Gênero não informado"}</p>
+                        <p>{generoFilme || "Gênero não informado"}</p>
                         <p>{filme.duracao ? `${filme.duracao} min` : "Duração não informada"}</p>
                     </div>
 
@@ -292,7 +322,7 @@ export default function Sessoes() {
                                 </p>
 
                                 <p className="text-sm text-[#545454]">
-                                    {filme.genero || "Gênero não informado"}
+                                    {generoFilme || "Gênero não informado"}
                                 </p>
 
                                 <p className="text-sm text-[#545454]">
