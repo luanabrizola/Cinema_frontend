@@ -6,52 +6,50 @@ import Link from "next/link";
 
 export default function Sessoes() {
     const diasSemana = ["Dom.", "Seg.", "Ter.", "Qua.", "Qui.", "Sex.", "Sáb."];
-
     const hoje = new Date();
-
-    const proximos7Dias = Array.from({ length: 7 }, (_, i) => {
-        const data = new Date();
-        data.setDate(hoje.getDate() + i);
-
-        const dia = String(data.getDate()).padStart(2, "0");
-        const semana = diasSemana[data.getDay()];
-
-        return { dia, semana };
-    });
-
     const meses = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
-
     const mesAtual = meses[hoje.getMonth()];
 
-    const [diaSelecionado, setDiaSelecionado] = useState(0);
-
-    const [horarioSelecionado, setHorarioSelecionado] = useState(null);
-
-    const horarios = [
-        { id: 1, hora: "15:30", tipo: ["DUB", "2D"] },
-        { id: 2, hora: "19:30", tipo: ["DUB", "2D"] }
-    ];
-
-    const dataSelecionada = diaSelecionado !== null ? proximos7Dias[diaSelecionado] : null;
-
-    const dataFormatada = dataSelecionada ? `${dataSelecionada.dia}/${String(hoje.getMonth() + 1).padStart(2, "0")}/${hoje.getFullYear()}` : "";
-
     const [filme, setFilme] = useState(null);
+    const [sessoes, setSessoes] = useState([]);
+    const [diasComSessao, setDiasComSessao] = useState([]);
+    const [diaSelecionado, setDiaSelecionado] = useState(null);
+    const [horarioSelecionado, setHorarioSelecionado] = useState(null);
     const [loading, setLoading] = useState(true);
 
     const searchParams = useSearchParams();
     const id = searchParams.get("id");
 
+    const dataSelecionada = diaSelecionado !== null ? diasComSessao[diaSelecionado] : null;
+
+    const horariosDoDia = dataSelecionada
+    ? sessoes
+        .filter(s => s.data === dataSelecionada.dataStr)
+        .map(s => ({
+            id: s.id_sessao,
+            hora: s.horario,
+            tipo: [s.idioma, s.dimensao]
+        }))
+    : [];
+
+    const dataFormatada = dataSelecionada
+        ? `${dataSelecionada.dia}/${String(new Date(dataSelecionada.dataStr).getMonth() + 1).padStart(2, "0")}/${new Date(dataSelecionada.dataStr).getFullYear()}`
+        : "";
+
+
     useEffect(() => {
-        if (!id) return;
+        if (!id) {
+            console.warn("Nenhum ID de filme fornecido na URL");
+            return;
+        }
+
+        console.log("ID do filme:", id);
 
         async function carregarFilme() {
             try {
                 const res = await fetch(`http://localhost:3333/filme/${id}`);
                 const data = await res.json();
-
                 console.log("Filme carregado:", data);
-
                 setFilme(data);
             } catch (error) {
                 console.error("Erro ao carregar filme:", error);
@@ -60,8 +58,36 @@ export default function Sessoes() {
             }
         }
 
+        async function carregarSessoes() {
+            try {
+                const res = await fetch(`http://localhost:3333/sessao/filme/${id}`);
+                const data = await res.json();
+                console.log("Sessões carregadas:", data);
+                setSessoes(data);
+            } catch (error) {
+                console.error("Erro ao carregar sessões:", error);
+            }
+        }
+
         carregarFilme();
+        carregarSessoes();
     }, [id]);
+
+    useEffect(() => {
+        if (sessoes.length === 0) return;
+
+        const dias = Array.from(new Set(sessoes.map(s => s.data))).map(dataStr => {
+            const data = new Date(dataStr);
+            return {
+                dia: String(data.getDate()).padStart(2, "0"),
+                semana: diasSemana[data.getDay()],
+                dataStr
+            };
+        });
+
+        setDiasComSessao(dias);
+        setDiaSelecionado(0);
+    }, [sessoes]);
 
     if (loading) return <p>Carregando filme...</p>;
     if (!filme) return <p>Filme não encontrado.</p>;
@@ -162,7 +188,7 @@ export default function Sessoes() {
                             {mesAtual}
                         </div>
                         <div className="flex w-[90%] h-full rounded-xl items-center justify-around mx-8">
-                            {proximos7Dias.map((item, index) => (
+                            {diasComSessao.map((item, index) => (
                                 <button
                                     key={index}
                                     onClick={() => setDiaSelecionado(index)}
@@ -177,13 +203,14 @@ export default function Sessoes() {
                                 </button>
                             ))}
 
+
                         </div>
                     </div>
                     <div className="border border-[#a6a6a6] w-[80%] h-[40%] rounded-xl mt-5 flex items-center">
                         <div className="ml-2.5 border-l-2 border-[#a60301] h-[72px] flex items-center">
                             <p className="font-bold text-xl ml-3">Sala 1</p>
                         </div>
-                        {horarios.map((horario) => (
+                        {horariosDoDia.map((horario) => (
                             <button
                                 key={horario.id}
                                 onClick={() => setHorarioSelecionado(horario.hora)}
@@ -206,6 +233,7 @@ export default function Sessoes() {
                                 </div>
                             </button>
                         ))}
+
 
                     </div>
                 </div>
