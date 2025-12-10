@@ -147,8 +147,20 @@ export default function Sessoes() {
 
             {/* Avançar para assentos */}
             <div className="flex flex-wrap justify-end w-full mt-4 gap-3">
-                <Link className="w-[18%] mr-10" href="/assentos">
-                    <button className="bg-[#a60301] text-white font-bold w-full h-12 rounded-full cursor-pointer transition-all duration-200 hover:bg-[#c90401] hover:scale-105">
+                <Link
+                    href={horarioSelecionado ? "/assentos" : "#"}
+                    onClick={(e) => {
+                        if (!horarioSelecionado) e.preventDefault();
+                    }}
+                    className={`w-[18%] mr-10`}
+                >
+                    <button
+                        className={`font-bold w-full h-12 rounded-full transition-all duration-200
+                ${horarioSelecionado
+                                ? "bg-[#a60301] text-white cursor-pointer hover:bg-[#c90401] hover:scale-105"
+                                : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                            }`}
+                    >
                         Continuar para assentos
                     </button>
                 </Link>
