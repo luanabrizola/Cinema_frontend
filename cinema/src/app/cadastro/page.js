@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link"; // <- importante!
 
 export default function Cadastro() {
     const [form, setForm] = useState({
@@ -22,8 +23,41 @@ export default function Cadastro() {
     async function handleSubmit(e) {
         e.preventDefault();
 
+        // 1. Verifica se as senhas coincidem
         if (form.senha !== form.confirmarSenha) {
             alert("As senhas não coincidem!");
+            return;
+        }
+
+        // 2. Validações da senha
+        const senha = form.senha;
+        const regexNumero = /\d/;           // pelo menos um número
+        const regexMaiuscula = /[A-Z]/;     // pelo menos uma letra maiúscula
+        const regexMinuscula = /[a-z]/;     // pelo menos uma letra minúscula
+        const regexEspecial = /[!@#$%^&*]/; // pelo menos um caractere especial
+
+        if (senha.length < 8) {
+            alert("A senha deve ter no mínimo 8 caracteres.");
+            return;
+        }
+
+        if (!regexNumero.test(senha)) {
+            alert("A senha deve conter pelo menos um número.");
+            return;
+        }
+
+        if (!regexMaiuscula.test(senha)) {
+            alert("A senha deve conter pelo menos uma letra maiúscula.");
+            return;
+        }
+
+        if (!regexMinuscula.test(senha)) {
+            alert("A senha deve conter pelo menos uma letra minúscula.");
+            return;
+        }
+
+        if (!regexEspecial.test(senha)) {
+            alert("A senha deve conter pelo menos um caractere especial (!@#$%^&*).");
             return;
         }
 
@@ -47,7 +81,6 @@ export default function Cadastro() {
 
             if (response.status === 201) {
                 alert("Usuário criado com sucesso!");
-                console.log("Usuário cadastrado:", data);
                 setForm({
                     nome_usuario: "",
                     cpf: "",
@@ -147,25 +180,14 @@ export default function Cadastro() {
                     />
 
                     <div className="flex justify-between pt-4">
-                        <button
-                            type="button"
-                            className="w-[48%] bg-[#ffd900a6] text-black font-semibold py-2 rounded-xl hover:bg-[#ffd900] transition"
-                            onClick={() =>
-                                setForm({
-                                    nome_usuario: "",
-                                    cpf: "",
-                                    data_nascimento: "",
-                                    telefone: "",
-                                    email: "",
-                                    senha: "",
-                                    confirmarSenha: "",
-                                    tipo: "cliente",
-                                    is_ativo: true
-                                })
-                            }
+
+                        <Link
+                            href="/login"
+                            className="w-[48%] bg-[#ffd900a6] text-black font-semibold py-2 rounded-xl hover:bg-[#ffd900] text-center transition"
                         >
                             Cancelar
-                        </button>
+                        </Link>
+
                         <button
                             type="submit"
                             className="w-[48%] bg-[#ffd900a6] text-black font-semibold py-2 rounded-xl hover:bg-[#ffd900] transition"
