@@ -159,7 +159,7 @@ export default function Page() {
       `}</style>
 
       <div className="relative w-full h-[400px]">
-        <img src="/ferraresi.jpeg" className="w-full h-full object-cover" />
+        <img src="/five nights at freddy's 2.jpg" className="w-full h-full object-cover" />
       </div>
 
       <div className="bg-[#ffd900] w-full h-20 text-white font-bold flex items-center justify-center text-xl">
