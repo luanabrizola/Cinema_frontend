@@ -23,14 +23,14 @@ export default function Sessoes() {
     const dataSelecionada = diaSelecionado !== null ? diasComSessao[diaSelecionado] : null;
 
     const horariosDoDia = dataSelecionada
-    ? sessoes
-        .filter(s => s.data === dataSelecionada.dataStr)
-        .map(s => ({
-            id: s.id_sessao,
-            hora: s.horario,
-            tipo: [s.idioma, s.dimensao]
-        }))
-    : [];
+        ? sessoes
+            .filter(s => s.data === dataSelecionada.dataStr)
+            .map(s => ({
+                id: s.id_sessao,
+                hora: s.horario.split(":").slice(0, 2).join(":"),
+                tipo: [s.idioma, s.dimensao]
+            }))
+        : [];
 
     const dataFormatada = dataSelecionada
         ? `${dataSelecionada.dia}/${String(new Date(dataSelecionada.dataStr).getMonth() + 1).padStart(2, "0")}/${new Date(dataSelecionada.dataStr).getFullYear()}`
@@ -83,7 +83,7 @@ export default function Sessoes() {
                 semana: diasSemana[data.getDay()],
                 dataStr
             };
-        });
+        }).sort((a, b) => new Date(a.dataStr) - new Date(b.dataStr));
 
         setDiasComSessao(dias);
         setDiaSelecionado(0);
@@ -296,14 +296,23 @@ export default function Sessoes() {
                                 <MapPinned className="w-4 h-4 mr-1" />
                                 CineAJL, sala 1
                             </p>
-
                             <div className="flex mt-1">
-                                <div className="bg-[#a60301] rounded-lg w-7 h-6 flex items-center justify-center text-white font-bold mr-1">
-                                    3D
-                                </div>
-                                <div className="bg-[#ffd900] rounded-lg w-8 h-6 flex items-center justify-center text-white font-bold">
-                                    DUB
-                                </div>
+                                {horariosDoDia.map((h) => {
+                                    if (h.hora === horarioSelecionado) {
+                                        const idiomaBadge = h.tipo[0].toLowerCase().includes("português") ? "DUB" : "LEG";
+                                        return (
+                                            <>
+                                                <div className="bg-[#a60301] rounded-lg w-7 h-6 flex items-center justify-center text-white font-bold mr-1">
+                                                    {h.tipo[1]}
+                                                </div>
+                                                <div className="bg-[#ffd900] rounded-lg w-8 h-6 flex items-center justify-center text-white font-bold">
+                                                    {idiomaBadge}
+                                                </div>
+                                            </>
+                                        );
+                                    }
+                                    return null;
+                                })}
                             </div>
                         </div>
                     </div>
