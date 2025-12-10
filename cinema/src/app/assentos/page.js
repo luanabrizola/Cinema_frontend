@@ -1,59 +1,107 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Star, Accessibility } from "lucide-react";
+import { Star, Accessibility, CalendarClock, MapPinned } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 export default function Assentos() {
     const params = useSearchParams();
     const idSala = params.get("id_sala");
+    const idSessao = params.get("id_sessao");
+    const idFilme = params.get("id_filme");
 
     const [assentos, setAssentos] = useState([]);
     const [selected, setSelected] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [filme, setFilme] = useState(null);
+    const [sessao, setSessao] = useState(null);
+    const [horarioSelecionado, setHorarioSelecionado] = useState(null);
+    const [horariosDoDia, setHorariosDoDia] = useState([]);
 
-    // 🔥 Busca do backend
+    async function carregarSessao() {
+        if (!idSessao) return;
+        try {
+            const resp = await fetch(`http://localhost:3333/sessao/${idSessao}`);
+            const data = await resp.json();
+            setSessao(data);
+            setHorarioSelecionado({
+                id: data.id_sessao,
+                hora: data.horario,
+                tipo: [data.idioma, data.dimensao],
+                id_sala: data.id_sala
+            });
+            setHorariosDoDia([{
+                id: data.id_sessao,
+                hora: data.horario,
+                tipo: [data.idioma, data.dimensao],
+                id_sala: data.id_sala
+            }]);
+        } catch (err) {
+            console.error("Erro ao carregar sessão:", err);
+        }
+    }
+
+    async function carregarFilme() {
+        if (!idFilme) return;
+        try {
+            const resp = await fetch(`http://localhost:3333/filme/${idFilme}`);
+            const data = await resp.json();
+            setFilme(data);
+        } catch (err) {
+            console.error("Erro ao carregar filme:", err);
+        }
+    }
+
     async function carregarAssentos() {
+        if (!idSala) {
+            console.warn("Nenhum id_sala recebido na URL.");
+            setLoading(false);
+            return;
+        }
+
         try {
             const resp = await fetch(`http://localhost:3333/assento?id_sala=${idSala}`);
             const data = await resp.json();
-
-            setAssentos(data);
+            setAssentos(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error("Erro ao carregar assentos:", err);
+            setAssentos([]);
         } finally {
             setLoading(false);
         }
     }
 
+    function formatarData(dataStr) {
+        const d = new Date(dataStr);
+        if (isNaN(d.getTime())) return "Data inválida";
+        return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+    }
+
     useEffect(() => {
-        if (idSala) carregarAssentos();
-    }, [idSala]);
+        carregarAssentos();
+        carregarFilme();
+        carregarSessao();
+    }, [idSala, idSessao, idFilme]);
 
-    // 🔠 Agrupa os assentos pela fila
-    const fileiras = assentos.reduce((acc, a) => {
-        if (!acc[a.fila]) acc[a.fila] = [];
-        acc[a.fila].push(a);
-        return acc;
-    }, {});
+    const fileiras = Array.isArray(assentos)
+        ? assentos.reduce((acc, a) => {
+            if (!acc[a.fila]) acc[a.fila] = [];
+            acc[a.fila].push(a);
+            return acc;
+        }, {})
+        : {};
 
-    // 🔤 Ordena por número
-    Object.keys(fileiras).forEach(fila => {
+    Object.keys(fileiras).forEach((fila) => {
         fileiras[fila].sort((a, b) => a.numero - b.numero);
     });
 
-    // 🔘 Função de seleção
     function toggleSeat(code, tipo) {
         if (tipo === "R") return;
-
-        setSelected(prev =>
-            prev.includes(code)
-                ? prev.filter(s => s !== code)
-                : [...prev, code]
+        setSelected((prev) =>
+            prev.includes(code) ? prev.filter((s) => s !== code) : [...prev, code]
         );
     }
 
-    // 🎨 Render de cada assento individual
     function Seat({ assento }) {
         const code = `${assento.fila}${assento.numero}`;
         const isSelected = selected.includes(code);
@@ -62,6 +110,8 @@ export default function Assentos() {
 
         switch (assento.tipo) {
             case "N":
+            case "CD":
+            case "V":
                 style += isSelected ? " bg-red-600" : " bg-neutral-600 hover:bg-neutral-500";
                 break;
             case "S":
@@ -69,12 +119,6 @@ export default function Assentos() {
                 break;
             case "R":
                 style += " bg-yellow-500 cursor-not-allowed";
-                break;
-            case "CD":
-                style += isSelected ? " bg-red-600" : " bg-neutral-600 hover:bg-neutral-500";
-                break;
-            case "V":
-                style += isSelected ? " bg-red-600" : " bg-neutral-600 hover:bg-neutral-500";
                 break;
         }
 
@@ -90,66 +134,61 @@ export default function Assentos() {
         );
     }
 
-    // if (loading) {
-    //     return (
-    //         <div className="w-full min-h-[70vh] flex items-center justify-center text-2xl font-bold">
-    //             Carregando assentos...
-    //         </div>
-    //     );
-    // }
+    function getClassColor(classificacao) {
+        const cores = {
+            "L": "#00A000",
+            "10": "#0072BB",
+            "12": "#E6B400",
+            "14": "#E65100",
+            "16": "#C62828",
+            "18": "#000000"
+        };
+        const key = (classificacao || "L").replace(/\D/g, "");
+        return cores[key] || "#00A000";
+    }
+
+    if (loading) return <p>Carregando...</p>;
+    if (!filme) return <p>Filme não encontrado.</p>;
+
+    const dataFormatada = sessao
+        ? new Date(sessao.data).toLocaleDateString("pt-BR")
+        : "";
 
     return (
-        <div className="min-h-[calc(100vh-110px)] w-full flex flex-col items-center">
+        <div className="min-h-[calc(100vh-110px)] w-full flex flex-col items-center px-2 sm:px-4">
             <div className="flex mt-5 w-full justify-center flex-wrap gap-y-2">
                 {[1, 2, 3, 4, 5, 6].map((n) => (
                     <div key={n} className="flex items-center">
                         <button className={`flex text-white w-9 h-9 sm:w-[50px] sm:h-[50px] lg:w-[60px] lg:h-[60px] rounded-xl items-center justify-center font-bold ${n <= 2 ? "bg-[#a60301]/50" : "bg-[#a60301]"}`}>
                             <p className="font-bold text-base sm:text-xl lg:text-2xl">{n}</p>
                         </button>
-
-                        {n < 6 && (
-                            <div className="border-t-2 border-[#545454] w-[35px] sm:w-[70px] lg:w-[100px] flex self-center"></div>
-                        )}
+                        {n < 6 && <div className="border-t-2 border-[#545454] w-[35px] sm:w-[70px] lg:w-[100px] flex self-center"></div>}
                     </div>
                 ))}
             </div>
 
+            {/* TÍTULOS */}
             <div className="flex w-full justify-center overflow-x-auto">
                 {["Sessões", "Assentos", "Ingressos", "Bomboniere", "Pagamento", "Confirmação"].map((t) => (
-                    <div key={t} className="w-[90px] sm:w-40 text-center font-bold text-xs sm:text-base">
-                        {t}
-                    </div>
+                    <div key={t} className="w-[90px] sm:w-40 text-center font-bold text-xs sm:text-base">{t}</div>
                 ))}
             </div>
 
-            <div className="w-full max-w-[1200px] mt-10 flex items-center gap-4">
-                <Link href="/sessoes">
-                    <button className="cursor-pointer rotate-180 bg-black text-white text-4xl w-12 h-12 rounded-full ml-10 hover:scale-105 hover:bg-black/80">➜</button>
-                </Link>
-                <span className="text-xl font-bold">Comprar ingresso</span>
-            </div>
-
+            {/* ASSENTOS */}
             <div className="w-full max-w-[1200px] mt-10 flex justify-between">
                 <div className="flex flex-col items-center w-[65%]">
-
                     <div className="flex flex-col gap-3">
                         {Object.entries(fileiras).map(([fila, seats]) => (
                             <div key={fila} className="flex gap-2 justify-center items-center">
                                 <span className="w-4 font-bold">{fila}</span>
-
                                 <div className="flex gap-2">
                                     {seats.map((assento) => (
                                         <Seat key={assento.id_assento} assento={assento} />
                                     ))}
                                 </div>
-
                                 <span className="w-4 font-bold">{fila}</span>
                             </div>
                         ))}
-                    </div>
-
-                    <div className="mt-6 text-lg font-bold">
-                        Assentos selecionados: {selected.join(", ") || "nenhum"}
                     </div>
                 </div>
 
@@ -165,22 +204,18 @@ export default function Assentos() {
                             <div className="w-6 h-6 bg-neutral-600 rounded" />
                             <span>Disponível</span>
                         </div>
-
                         <div className="flex items-center gap-3">
                             <div className="w-6 h-6 bg-red-600 rounded" />
                             <span>Selecionado</span>
                         </div>
-
                         <div className="flex items-center gap-3">
                             <div className="w-6 h-6 bg-yellow-500 rounded" />
                             <span>Reservado</span>
                         </div>
-
                         <div className="flex items-center gap-3">
                             <Accessibility size={20} />
                             <span>Cadeirante</span>
                         </div>
-
                         <div className="flex items-center gap-3">
                             <Star size={20} />
                             <span>Vip</span>
@@ -188,6 +223,85 @@ export default function Assentos() {
                     </div>
                 </div>
             </div>
+
+            {filme && sessao && (
+                <div className="flex fixed bottom-0 w-full flex-col bg-white border-t border-[#a6a6a6]">
+                    <div className="flex flex-wrap mt-2 mb-2 ml-2 sm:ml-8 items-center gap-4">
+
+                        <div className="flex flex-row items-center gap-4">
+                            <img
+                                src={filme.foto_capa ? `http://localhost:3333/${filme.foto_capa}` : "/placeholder.jpg"}
+                                alt={filme.nome_filme}
+                                className="h-[90px] sm:h-[120px] rounded-md object-cover"
+                            />
+
+                            <div className="flex flex-col">
+                                <div className="flex items-center font-bold">
+                                    {filme.nome_filme}
+                                    <div
+                                        className="rounded-lg w-8 h-8 flex items-center justify-center text-white font-bold ml-2"
+                                        style={{ backgroundColor: getClassColor(filme.classificacao) }}
+                                    >
+                                        {(filme.classificacao || "L").replace(/\D/g, "")}
+                                    </div>
+                                </div>
+                                <span className="text-sm text-[#545454]">{filme.genero || "Gênero não informado"}</span>
+                                <span className="text-sm text-[#545454]">{filme.duracao ? `${filme.duracao} min` : "Duração não informada"}</span>
+                            </div>
+                        </div>
+
+                        <div className="border-r border-[#a6a6a6] h-24 mx-6" />
+
+                        <div className="flex flex-col">
+                            <span className="font-bold">Sessão</span>
+
+                            <span className="text-sm text-[#545454] flex items-center">
+                                <CalendarClock className="w-4 h-4 mr-1" />
+                                {sessao.data ? new Date(sessao.data).toLocaleDateString("pt-BR") : "Data não informada"} às {sessao.horario || "Hora não informada"}
+                            </span>
+
+                            <span className="text-sm text-[#545454] flex items-center mt-1">
+                                <MapPinned className="w-4 h-4 mr-1" />
+                                CineAJL, sala {sessao.id_sala || "1"}
+                            </span>
+
+                            <div className="flex mt-1 gap-1">
+                                {horariosDoDia.map((h) => {
+                                    if (h.hora === horarioSelecionado?.hora) {
+                                        const idiomaBadge = h.tipo[0]?.toLowerCase().includes("português") ? "DUB" : "LEG";
+                                        const tipoSessao = h.tipo[1] || "2D";
+
+                                        return (
+                                            <div className="flex gap-1" key={h.id}>
+                                                <div className="bg-[#a60301] rounded-lg w-7 h-6 flex items-center justify-center text-white font-bold">
+                                                    {tipoSessao}
+                                                </div>
+                                                <div className="bg-[#ffd900] rounded-lg w-8 h-6 flex items-center justify-center text-white font-bold">
+                                                    {idiomaBadge}
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="border-l border-[#a6a6a6] h-24 mx-6" />
+
+                        <div className="flex flex-col">
+                            <span className="font-bold">Assentos selecionados</span>
+                            <span className="text-sm text-[#545454]">
+                                {selected.length > 0 ? selected.join(", ") : "Nenhum"}
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+            )}
+
+
+
         </div>
     );
 }
