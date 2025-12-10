@@ -7,9 +7,7 @@ export default function About(){
             <div className="bg-[#f1f779] w-[300px] min-h-[380px] rounded-xl flex flex-col items-center p-6 text-center shadow-lg">
                 <img src="/juliette.jpg" alt="" className="h-24 w-24 rounded-full mb-4" />
                 <p className="text-xl font-semibold mb-2">Ana Julia Defendi</p>
-                <p className="text-sm break-words w-24">
-                    aaaaa
-                </p>
+
                 <div className="flex felx-nowrap">
                 <a
                         href="https://instagram.com/anajuliadefendi"
@@ -34,7 +32,6 @@ export default function About(){
             <div className="bg-[#f1f779] w-[300px] min-h-[380px] rounded-xl flex flex-col items-center p-6 text-center shadow-lg">
                 <img src="/taylor.jpeg" alt="" className="h-24 w-24 rounded-full mb-4" />
                 <p className="text-xl font-semibold mb-2">Ana Julia Menegasso</p>
-                <p className="text-sm break-words w-24">Conteúdo</p>
                 <div className="flex felx-nowrap">
                 <a
                         href="https://instagram.com/anajuliamcruz"
@@ -59,7 +56,6 @@ export default function About(){
                 <img src="/ferraresi.jpeg" alt="" className="h-24 w-24 rounded-full mb-4" />
                 <p className="text-xl font-semibold mb-2">Luana Brizola</p>
                 <p className="text-sm break-words w-24">
-                    loren biehbgejhbgeurgberigbrbgrubrubgurgburbgurbgur
                 </p>
                 <div className="flex felx-nowrap">
                 <a
