@@ -158,6 +158,7 @@ export default function Cadastro() {
                             value={form.telefone}
                             onChange={handleChange}
                             className="rounded-lg p-2 w-1/2 bg-[#fff6f6]"
+                            required
                         />
                     </div>
 
