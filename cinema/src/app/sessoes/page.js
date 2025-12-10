@@ -28,7 +28,8 @@ export default function Sessoes() {
             .map(s => ({
                 id: s.id_sessao,
                 hora: s.horario.split(":").slice(0, 2).join(":"),
-                tipo: [s.idioma, s.dimensao]
+                tipo: [s.idioma, s.dimensao],
+                id_sala: s.id_sala
             }))
         : [];
 
@@ -114,6 +115,8 @@ export default function Sessoes() {
 
         return cores[key] || "#00A000";
     };
+    console.log("Horário selecionado:", horarioSelecionado);
+
 
     return (
         <div className="min-h-[calc(100vh-110px)] w-full flex-col flex items-center px-2 sm:px-4">
@@ -148,12 +151,17 @@ export default function Sessoes() {
             {/* Avançar para assentos */}
             <div className="flex flex-wrap justify-end w-full mt-4 gap-3">
                 <Link
-                    href={horarioSelecionado ? "/assentos" : "#"}
+                    href={
+                        horarioSelecionado
+                            ? `/assentos?id_sessao=${horarioSelecionado.id}&id_filme=${id}&id_sala=${horarioSelecionado.id_sala}`
+                            : "#"
+                    }
                     onClick={(e) => {
                         if (!horarioSelecionado) e.preventDefault();
                     }}
-                    className={`w-[18%] mr-10`}
+                    className="w-[18%] mr-10"
                 >
+
                     <button
                         className={`font-bold w-full h-12 rounded-full transition-all duration-200
                 ${horarioSelecionado
@@ -225,7 +233,7 @@ export default function Sessoes() {
                         {horariosDoDia.map((horario) => (
                             <button
                                 key={horario.id}
-                                onClick={() => setHorarioSelecionado(horario.hora)}
+                                onClick={() => setHorarioSelecionado(horario)}
                                 className={`flex w-[20%] h-[80%] rounded-xl items-center justify-center flex-col ml-10 cursor-pointer transition-all ${horarioSelecionado === horario.hora
                                     ? "border border-[#a6a6a6] scale-105"
                                     : ""
@@ -301,7 +309,8 @@ export default function Sessoes() {
 
                             <p className="text-sm text-[#545454] flex items-center">
                                 <CalendarClock className="w-4 h-4 mr-1" />
-                                {dataFormatada} às {horarioSelecionado}
+                                {dataFormatada} às {horarioSelecionado.hora}
+
                             </p>
 
                             <p className="text-sm text-[#545454] flex items-center mt-1">
@@ -310,7 +319,7 @@ export default function Sessoes() {
                             </p>
                             <div className="flex mt-1">
                                 {horariosDoDia.map((h) => {
-                                    if (h.hora === horarioSelecionado) {
+                                    if (h.hora === horarioSelecionado.hora) {
                                         const idiomaBadge = h.tipo[0].toLowerCase().includes("português") ? "DUB" : "LEG";
                                         return (
                                             <>
