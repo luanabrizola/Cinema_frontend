@@ -17,27 +17,57 @@ export default function Assentos() {
     const [sessao, setSessao] = useState(null);
     const [horarioSelecionado, setHorarioSelecionado] = useState(null);
     const [horariosDoDia, setHorariosDoDia] = useState([]);
+    const [nomeSala, setNomeSala] = useState("");
+
 
     async function carregarSessao() {
         if (!idSessao) return;
         try {
             const resp = await fetch(`http://localhost:3333/sessao/${idSessao}`);
             const data = await resp.json();
-            setSessao(data);
+
+            const formattedHora = data.horario ? String(data.horario).split(":").slice(0, 2).join(":") : data.horario;
+
+            let formattedData = "";
+            if (data.data) {
+                if (/^\d{4}-\d{2}-\d{2}$/.test(data.data)) {
+                    const [year, month, day] = data.data.split("-").map(Number);
+                    const d = new Date(year, month - 1, day);
+                    formattedData = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+                } else {
+                    const d = new Date(data.data);
+                    if (!isNaN(d.getTime())) formattedData = d.toLocaleDateString("pt-BR");
+                }
+            }
+
+            setSessao({ ...data, horarioFormatado: formattedHora, dataFormatada: formattedData });
+
             setHorarioSelecionado({
                 id: data.id_sessao,
-                hora: data.horario,
+                hora: formattedHora,
                 tipo: [data.idioma, data.dimensao],
                 id_sala: data.id_sala
             });
             setHorariosDoDia([{
                 id: data.id_sessao,
-                hora: data.horario,
+                hora: formattedHora,
                 tipo: [data.idioma, data.dimensao],
                 id_sala: data.id_sala
             }]);
         } catch (err) {
             console.error("Erro ao carregar sessão:", err);
+        }
+    }
+
+    async function carregarSala() {
+        if (!idSala) return;
+
+        try {
+            const resp = await fetch(`http://localhost:3333/sala/${idSala}`);
+            const data = await resp.json();
+            setNomeSala(data.nome_sala);
+        } catch (err) {
+            console.error("Erro ao carregar sala:", err);
         }
     }
 
@@ -72,16 +102,53 @@ export default function Assentos() {
     }
 
     function formatarData(dataStr) {
+        if (!dataStr) return "Data inválida";
+
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dataStr)) {
+            const [year, month, day] = dataStr.split("-").map(Number);
+            const d = new Date(year, month - 1, day);
+            return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+        }
+
         const d = new Date(dataStr);
         if (isNaN(d.getTime())) return "Data inválida";
-        return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+        return d.toLocaleDateString("pt-BR");
     }
 
     useEffect(() => {
         carregarAssentos();
         carregarFilme();
+        carregarSala();
         carregarSessao();
     }, [idSala, idSessao, idFilme]);
+
+    useEffect(() => {
+        if (!idFilme) return;
+
+        async function carregarGenero() {
+            try {
+                const res = await fetch(`http://localhost:3333/genero-do-filme/filme/${idFilme}`);
+                const data = await res.json();
+
+                if (Array.isArray(data) && data.length > 0) {
+                    const idGenero = data[0].id_genero;
+                    const resGenero = await fetch(`http://localhost:3333/genero/${idGenero}`);
+                    const generoData = await resGenero.json();
+
+                    setFilme((prev) => {
+                        if (prev) return { ...prev, genero: generoData.nome_genero };
+                        return { genero: generoData.nome_genero };
+                    });
+                } else {
+                    setFilme((prev) => (prev ? { ...prev, genero: "Gênero não informado" } : { genero: "Gênero não informado" }));
+                }
+            } catch (error) {
+                console.error("Erro ao carregar gênero do filme:", error);
+            }
+        }
+
+        carregarGenero();
+    }, [idFilme]);
 
     const fileiras = Array.isArray(assentos)
         ? assentos.reduce((acc, a) => {
@@ -151,7 +218,7 @@ export default function Assentos() {
     if (!filme) return <p>Filme não encontrado.</p>;
 
     const dataFormatada = sessao
-        ? new Date(sessao.data).toLocaleDateString("pt-BR")
+        ? (sessao.dataFormatada || (sessao.data ? formatarData(sessao.data) : ""))
         : "";
 
     return (
@@ -258,14 +325,15 @@ export default function Assentos() {
                         <div className="flex flex-col">
                             <span className="font-bold">Sessão</span>
 
-                            <span className="text-sm text-[#545454] flex items-center">
+                            <p className="text-sm text-[#545454] flex items-center">
                                 <CalendarClock className="w-4 h-4 mr-1" />
-                                {sessao.data ? new Date(sessao.data).toLocaleDateString("pt-BR") : "Data não informada"} às {sessao.horario || "Hora não informada"}
-                            </span>
+                                {dataFormatada} às {horarioSelecionado.hora}
+
+                            </p>
 
                             <span className="text-sm text-[#545454] flex items-center mt-1">
                                 <MapPinned className="w-4 h-4 mr-1" />
-                                CineAJL, sala {sessao.id_sala || "1"}
+                                CineAJL, {nomeSala}
                             </span>
 
                             <div className="flex mt-1 gap-1">
@@ -294,18 +362,12 @@ export default function Assentos() {
 
                         <div className="flex flex-col">
                             <span className="font-bold">Assentos selecionados</span>
-                            <span className="text-sm text-[#545454]">
-                                {selected.length > 0 ? selected.join(", ") : "Nenhum"}
-                            </span>
+                            <span className="text-sm text-[#545454]">{selected.length > 0 ? selected.join(", ") : "Nenhum"}</span>
                         </div>
 
                     </div>
                 </div>
             )}
-
-
-
-
 
         </div>
     );
