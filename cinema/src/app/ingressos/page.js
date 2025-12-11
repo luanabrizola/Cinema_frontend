@@ -1,12 +1,21 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CalendarClock, MapPinned } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 export default function Ingressos() {
     const params = useSearchParams();
+
     const assentosSelecionados = params.get("assentosSelecionados") || "";
+    const idFilme = params.get("id_filme");
+    const idSala = params.get("id_sala");
+    const idSessao = params.get("id_sessao");
+    const dataSessao = params.get("data");
+    const horarioSessao = params.get("horario");
+
+    const [nomeSala, setNomeSala] = useState("");
+
     const selected = assentosSelecionados.split(",").filter(Boolean);
     const maxIngressos = selected.length;
 
@@ -27,33 +36,85 @@ export default function Ingressos() {
         if (totalSelecionado < maxIngressos) setInteiraQtd(prev => prev + 1);
     };
 
-    // --- Dados de exemplo para o rodapé ---
-    const filme = {
-        nome_filme: "Filme Exemplo",
-        foto_capa: null,
-        classificacao: "L",
-        genero: "Ação",
-        duracao: 120
-    };
-    const sessao = {
-        data: "2025-12-10",
-        horario: "19:30",
-        id_sala: "1"
-    };
-    const horarioSelecionado = {
-        hora: "19:30",
-        tipo: ["Português", "2D"]
-    };
-    const horariosDoDia = [
-        { id: 1, hora: "17:00", tipo: ["Português", "2D"] },
-        { id: 2, hora: "19:30", tipo: ["Português", "2D"] },
-        { id: 3, hora: "22:00", tipo: ["Legendado", "3D"] }
-    ];
+    const [filme, setFilme] = useState(null);
+
+    function formatDateSafe(dateStr) {
+        if (!dateStr) return "";
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+            const [year, month, day] = dateStr.split("-").map(Number);
+            return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}/${year}`;
+        }
+        const isoMatch = dateStr.match(/^(\d{4}-\d{2}-\d{2})/);
+        if (isoMatch) {
+            const [year, month, day] = isoMatch[1].split("-").map(Number);
+            return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}/${year}`;
+        }
+        const d = new Date(dateStr);
+        if (!isNaN(d.getTime())) return d.toLocaleDateString("pt-BR");
+        return dateStr;
+    }
+
+    function getClassColor(classificacao) {
+        const cores = {
+            "L": "#00A000",
+            "10": "#0072BB",
+            "12": "#E6B400",
+            "14": "#E65100",
+            "16": "#C62828",
+            "18": "#000000"
+        };
+        const key = (classificacao || "L").toString().replace(/\D/g, "") || "L";
+        return cores[key] || "#00A000";
+    }
+
+    useEffect(() => {
+        async function carregarFilmeEGênero() {
+            if (!idFilme) return;
+            try {
+                const res = await fetch(`http://localhost:3333/filme/${idFilme}`);
+                const filmeDados = await res.json();
+
+                try {
+                    const assocRes = await fetch(`http://localhost:3333/genero-do-filme/filme/${idFilme}`);
+                    const assoc = await assocRes.json();
+                    if (Array.isArray(assoc) && assoc.length > 0) {
+                        const idGenero = assoc[0].id_genero;
+                        const generoRes = await fetch(`http://localhost:3333/genero/${idGenero}`);
+                        const generoDados = await generoRes.json();
+                        filmeDados.genero = generoDados.nome_genero;
+                    } else {
+                        filmeDados.genero = filmeDados.genero || "Gênero não informado";
+                    }
+                } catch (errGenero) {
+                    filmeDados.genero = filmeDados.genero || "Gênero não informado";
+                }
+
+                setFilme(filmeDados);
+            } catch (error) {
+                console.error("Erro ao carregar filme:", error);
+            }
+        }
+
+        async function carregarSala() {
+            if (!idSala) return;
+            try {
+                const resp = await fetch(`http://localhost:3333/sala/${idSala}`);
+                const salaDados = await resp.json();
+                setNomeSala(salaDados.nome_sala || salaDados.nome || String(idSala));
+            } catch (err) {
+                console.error("Erro ao carregar sala:", err);
+                setNomeSala(String(idSala));
+            }
+        }
+
+        carregarFilmeEGênero();
+        carregarSala();
+
+    }, [idFilme, idSala]);
 
     return (
         <div className="min-h-[calc(100vh-110px)] w-full flex-col flex items-center px-2 sm:px-4">
 
-            {/* Barra de progresso */}
             <div className="flex mt-5 w-full justify-center flex-wrap gap-y-2">
                 {[1, 2, 3, 4, 5, 6].map((n) => (
                     <div key={n} className="flex items-center">
@@ -78,7 +139,21 @@ export default function Ingressos() {
                     <Link href="/assentos">
                         <button className="rotate-180 bg-black text-white text-4xl w-12 h-12 rounded-full ml-10 cursor-pointer transition-all duration-200 hover:scale-105 hover:bg-black/80">➜</button>
                     </Link>
-                    <Link href="/bomboniere" className="mr-10 w-[18%]">
+
+                    <Link
+                        href={{
+                            pathname: "/bomboniere",
+                            query: {
+                                assentosSelecionados,
+                                id_filme: idFilme,
+                                id_sessao: idSessao,
+                                data: dataSessao,
+                                horario: horarioSessao,
+                                sala: nomeSala || idSala
+                            }
+                        }}
+                        className="mr-10 w-[18%]"
+                    >
                         <button className="bg-[#a60301] text-white font-bold w-full h-12 rounded-full cursor-pointer transition-all duration-200 hover:bg-[#c90401] hover:scale-105">
                             Continuar para bomboniere
                         </button>
@@ -132,7 +207,6 @@ export default function Ingressos() {
                             </div>
                         </div>
 
-                        {/* Aviso limite */}
                         <p className="text-red-600 font-bold mt-2 text-center">
                             Você pode selecionar até {maxIngressos} ingressos.
                         </p>
@@ -140,7 +214,7 @@ export default function Ingressos() {
                 </div>
             </div>
 
-            {filme && sessao && (
+            {filme && (
                 <div className="flex fixed bottom-0 w-full flex-col bg-white border-t border-[#a6a6a6]">
                     <div className="flex flex-wrap mt-2 mb-2 ml-2 sm:ml-8 items-center gap-4">
 
@@ -154,12 +228,17 @@ export default function Ingressos() {
                             <div className="flex flex-col">
                                 <div className="flex items-center font-bold">
                                     {filme.nome_filme}
-                                    <div className="rounded-lg w-8 h-8 flex items-center justify-center text-white font-bold ml-2">
-                                        {(filme.classificacao || "L").replace(/\D/g, "")}
+
+                                    <div
+                                        className="rounded-lg w-8 h-8 flex items-center justify-center text-white font-bold ml-2"
+                                        style={{ backgroundColor: getClassColor(filme.classificacao) }}
+                                    >
+                                        {(filme.classificacao || "L").toString().replace(/\D/g, "") || "L"}
                                     </div>
                                 </div>
-                                <span className="text-sm text-[#545454]">{filme.genero}</span>
-                                <span className="text-sm text-[#545454]">{filme.duracao} min</span>
+
+                                <span className="text-sm text-[#545454]">{filme.genero || "Gênero não informado"}</span>
+                                <span className="text-sm text-[#545454]">{filme.duracao ? `${filme.duracao} min` : "Duração não informada"}</span>
                             </div>
                         </div>
 
@@ -167,34 +246,24 @@ export default function Ingressos() {
 
                         <div className="flex flex-col">
                             <span className="font-bold">Sessão</span>
-                            <span className="text-sm text-[#545454] flex items-center">
+
+                            <p className="text-sm text-[#545454] flex items-center">
                                 <CalendarClock className="w-4 h-4 mr-1" />
-                                {new Date(sessao.data).toLocaleDateString("pt-BR")} às {sessao.horario}
-                            </span>
+                                {formatDateSafe(dataSessao)} às {horarioSessao?.slice(0, 5)}
+                            </p>
+
                             <span className="text-sm text-[#545454] flex items-center mt-1">
                                 <MapPinned className="w-4 h-4 mr-1" />
-                                CineAJL, sala {sessao.id_sala}
+                                CineAJL, {idSala}
                             </span>
 
                             <div className="flex mt-1 gap-1">
-                                {horariosDoDia.map((h) => {
-                                    if (h.hora === horarioSelecionado.hora) {
-                                        const idiomaBadge = h.tipo[0].toLowerCase().includes("português") ? "DUB" : "LEG";
-                                        const tipoSessao = h.tipo[1] || "2D";
-
-                                        return (
-                                            <div className="flex gap-1" key={h.id}>
-                                                <div className="bg-[#a60301] rounded-lg w-7 h-6 flex items-center justify-center text-white font-bold">
-                                                    {tipoSessao}
-                                                </div>
-                                                <div className="bg-[#ffd900] rounded-lg w-8 h-6 flex items-center justify-center text-white font-bold">
-                                                    {idiomaBadge}
-                                                </div>
-                                            </div>
-                                        );
-                                    }
-                                    return null;
-                                })}
+                                <div className="bg-[#a60301] rounded-lg w-7 h-6 flex items-center justify-center text-white font-bold">
+                                    2D
+                                </div>
+                                <div className="bg-[#ffd900] rounded-lg w-8 h-6 flex items-center justify-center text-black font-bold">
+                                    DUB
+                                </div>
                             </div>
                         </div>
 
@@ -210,7 +279,6 @@ export default function Ingressos() {
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

@@ -263,11 +263,21 @@ export default function Assentos() {
                     <Link
                         href={{
                             pathname: "/ingressos",
-                            query: { assentosSelecionados: selected.join(",") },
+                            query: {
+                                assentosSelecionados: selected.join(","),
+                                id_filme: filme.id_filme,
+                                id_sessao: sessao.id_sessao,
+                                data: sessao.data,
+                                horario: sessao.horario,
+                                sala: sessao.id_sala,
+                            },
                         }}
                     >
-                        <button className="bg-[#a60301] cursor-pointer hover:bg-[#c90401] text-white p-2 py-4 rounded-xl font-semibold text-lg flex items-center justify-center gap-3 ">Continuar para ingressos ➜</button>
+                        <button className="bg-[#a60301] cursor-pointer hover:bg-[#c90401] text-white p-2 py-4 rounded-xl font-semibold text-lg flex items-center justify-center gap-3 ">
+                            Continuar para ingressos ➜
+                        </button>
                     </Link>
+
 
                     <div className="mt-8 flex flex-col gap-4 text-lg">
                         <div className="flex items-center gap-3">
