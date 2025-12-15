@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link"; // <- importante!
+import Link from "next/link";
 
 export default function Cadastro() {
     const [form, setForm] = useState({
@@ -15,62 +15,82 @@ export default function Cadastro() {
         is_ativo: true
     });
 
+    function maskCPF(value) {
+        value = value.replace(/\D/g, "").slice(0, 11);
+
+        value = value.replace(/(\d{3})(\d)/, "$1.$2");
+        value = value.replace(/(\d{3})(\d)/, "$1.$2");
+        value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+        return value;
+    }
+
+    function maskTelefone(value) {
+        value = value.replace(/\D/g, "").slice(0, 11);
+
+        if (value.length <= 10) {
+            return value
+                .replace(/(\d{2})(\d)/, "($1) $2")
+                .replace(/(\d{4})(\d)/, "$1-$2");
+        }
+
+        return value
+            .replace(/(\d{2})(\d)/, "($1) $2")
+            .replace(/(\d{5})(\d)/, "$1-$2");
+    }
+
     function handleChange(e) {
         const { name, value } = e.target;
+
+        if (name === "cpf") {
+            setForm({ ...form, cpf: maskCPF(value) });
+            return;
+        }
+
+        if (name === "telefone") {
+            setForm({ ...form, telefone: maskTelefone(value) });
+            return;
+        }
+
         setForm({ ...form, [name]: value });
     }
+
 
     async function handleSubmit(e) {
         e.preventDefault();
 
+        let errosMsg = [];
+
+        const cpfLimpo = form.cpf.replace(/\D/g, "");
+        if (cpfLimpo.length !== 11) {
+            errosMsg.push("CPF deve conter 11 dígitos.");
+        }
+
         if (form.senha !== form.confirmarSenha) {
-            alert("As senhas não coincidem!");
-            return;
+            errosMsg.push("As senhas não coincidem.");
         }
 
-        const senha = form.senha;
-        const regexNumero = /\d/;           
-        const regexMaiuscula = /[A-Z]/;    
-        const regexMinuscula = /[a-z]/;     
-        const regexEspecial = /[!@#$%^&*]/;
-
-        if (senha.length < 8) {
-            alert("A senha deve ter no mínimo 8 caracteres.");
-            return;
+        if (form.senha.length < 8) {
+            errosMsg.push("A senha deve ter no mínimo 8 caracteres.");
+        } else {
+            if (!/\d/.test(form.senha))
+                errosMsg.push("A senha deve conter pelo menos um número.");
+            if (!/[A-Z]/.test(form.senha))
+                errosMsg.push("A senha deve conter pelo menos uma letra maiúscula.");
+            if (!/[a-z]/.test(form.senha))
+                errosMsg.push("A senha deve conter pelo menos uma letra minúscula.");
+            if (!/[!@#$%^&*]/.test(form.senha))
+                errosMsg.push("A senha deve conter pelo menos um caractere especial (!@#$%^&*).");
         }
 
-        if (!regexNumero.test(senha)) {
-            alert("A senha deve conter pelo menos um número.");
-            return;
+        const telefoneNumeros = form.telefone.replace(/\D/g, "");
+        if (telefoneNumeros.length < 10 || telefoneNumeros.length > 11) {
+            errosMsg.push("Telefone deve conter 10 ou 11 números.");
         }
 
-        if (!regexMaiuscula.test(senha)) {
-            alert("A senha deve conter pelo menos uma letra maiúscula.");
+        if (errosMsg.length > 0) {
+            alert(errosMsg.join("\n"));
             return;
-        }
-
-        if (!regexMinuscula.test(senha)) {
-            alert("A senha deve conter pelo menos uma letra minúscula.");
-            return;
-        }
-
-        if (!regexEspecial.test(senha)) {
-            alert("A senha deve conter pelo menos um caractere especial (!@#$%^&*).");
-            return;
-        }
-
-        const cpfNumeros = form.cpf.replace(/\D/g, '');
-        if (cpfNumeros.length !== 11) {
-            alert("O CPF deve conter exatamente 11 números.");
-            return;
-        }
-
-        if (form.telefone) {
-            const telefoneNumeros = form.telefone.replace(/\D/g, '');
-            if (telefoneNumeros.length < 10 || telefoneNumeros.length > 11) {
-                alert("O telefone deve conter 10 ou 11 números.");
-                return;
-            }
         }
 
         try {
@@ -81,7 +101,7 @@ export default function Cadastro() {
                     nome_usuario: form.nome_usuario,
                     cpf: form.cpf,
                     data_nascimento: form.data_nascimento,
-                    telefone: form.telefone,
+                    telefone: telefoneNumeros,
                     email: form.email,
                     senha: form.senha,
                     tipo: form.tipo,
@@ -93,24 +113,12 @@ export default function Cadastro() {
 
             if (response.status === 201) {
                 alert("Usuário criado com sucesso!");
-                setForm({
-                    nome_usuario: "",
-                    cpf: "",
-                    data_nascimento: "",
-                    telefone: "",
-                    email: "",
-                    senha: "",
-                    confirmarSenha: "",
-                    tipo: "cliente",
-                    is_ativo: true
-                });
             } else {
                 alert("Erro: " + (data.error || data.message));
-                console.error(data);
             }
         } catch (err) {
-            console.error(err);
             alert("Erro ao conectar ao servidor.");
+            console.error(err);
         }
     }
 
