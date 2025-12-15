@@ -1,8 +1,11 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function Cadastro() {
+    const router = useRouter();
+
     const [form, setForm] = useState({
         nome_usuario: "",
         cpf: "",
@@ -112,7 +115,24 @@ export default function Cadastro() {
             const data = await response.json();
 
             if (response.status === 201) {
-                alert("Usuário criado com sucesso!");
+                const loginResponse = await fetch("http://localhost:3333/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email: form.email,
+                        senha: form.senha
+                    })
+                });
+
+                const loginData = await loginResponse.json();
+
+                if (!loginResponse.ok) {
+                    alert("Conta criada, mas falha no login automático.");
+                    return;
+                }
+
+                localStorage.setItem("usuario", JSON.stringify(loginData));
+                router.push("/");
             } else {
                 alert("Erro: " + (data.error || data.message));
             }
