@@ -5,6 +5,16 @@ import { ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function Page() {
+  const [usuario, setUsuario] = useState(null);
+  const [abrirMenu, setAbrirMenu] = useState(false);
+
+  useEffect(() => {
+    const userStorage = localStorage.getItem("usuario");
+    if (userStorage) {
+      setUsuario(JSON.parse(userStorage));
+    }
+  }, []);
+
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
 
