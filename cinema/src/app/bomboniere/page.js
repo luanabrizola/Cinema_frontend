@@ -1,9 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CalendarClock, MapPinned, Search } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 export default function Bomboniere() {
+    const params = useSearchParams();
+
+    const assentosSelecionados = params.get("assentosSelecionados") || "";
+    const idFilme = params.get("id_filme");
+    const idSala = params.get("id_sala");
+    const idSessao = params.get("id_sessao");
+    const dataSessao = params.get("data");
+    const horarioSessao = params.get("horario");
+
+    const [nomeSala, setNomeSala] = useState("");
+
+    const selected = assentosSelecionados.split(",").filter(Boolean);
+
     const [categoria, setCategoria] = useState(null);
 
     const [qtdBebidas, setQtdBebidas] = useState({});
@@ -85,6 +99,80 @@ export default function Bomboniere() {
 
     const totalGeral = totalBebidas + totalPipocas;
 
+    const [filme, setFilme] = useState(null);
+
+    function formatDateSafe(dateStr) {
+        if (!dateStr) return "";
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+            const [year, month, day] = dateStr.split("-").map(Number);
+            return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}/${year}`;
+        }
+        const isoMatch = dateStr.match(/^(\d{4}-\d{2}-\d{2})/);
+        if (isoMatch) {
+            const [year, month, day] = isoMatch[1].split("-").map(Number);
+            return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}/${year}`;
+        }
+        const d = new Date(dateStr);
+        if (!isNaN(d.getTime())) return d.toLocaleDateString("pt-BR");
+        return dateStr;
+    }
+
+    function getClassColor(classificacao) {
+        const cores = {
+            "L": "#00A000",
+            "10": "#0072BB",
+            "12": "#E6B400",
+            "14": "#E65100",
+            "16": "#C62828",
+            "18": "#000000"
+        };
+        const key = (classificacao || "L").toString().replace(/\D/g, "") || "L";
+        return cores[key] || "#00A000";
+    }
+
+    useEffect(() => {
+        async function carregarFilmeEGênero() {
+            if (!idFilme) return;
+            try {
+                const res = await fetch(`http://localhost:3333/filme/${idFilme}`);
+                const filmeDados = await res.json();
+
+                try {
+                    const assocRes = await fetch(`http://localhost:3333/genero-do-filme/filme/${idFilme}`);
+                    const assoc = await assocRes.json();
+                    if (Array.isArray(assoc) && assoc.length > 0) {
+                        const idGenero = assoc[0].id_genero;
+                        const generoRes = await fetch(`http://localhost:3333/genero/${idGenero}`);
+                        const generoDados = await generoRes.json();
+                        filmeDados.genero = generoDados.nome_genero;
+                    } else {
+                        filmeDados.genero = filmeDados.genero || "Gênero não informado";
+                    }
+                } catch (errGenero) {
+                    filmeDados.genero = filmeDados.genero || "Gênero não informado";
+                }
+
+                setFilme(filmeDados);
+            } catch (error) {
+                console.error("Erro ao carregar filme:", error);
+            }
+        }
+
+        async function carregarSala() {
+            if (!idSala) return;
+            try {
+                const resp = await fetch(`http://localhost:3333/sala/${idSala}`);
+                const salaDados = await resp.json();
+                setNomeSala(salaDados.nome_sala || salaDados.nome || String(idSala));
+            } catch (err) {
+                console.error("Erro ao carregar sala:", err);
+                setNomeSala(String(idSala));
+            }
+        }
+
+        carregarFilmeEGênero();
+        carregarSala();
+    }, [idFilme, idSala]);
 
     return (
         <div className="min-h-[calc(100vh-110px)] w-full flex-col flex items-center px-2 sm:px-4">
@@ -409,78 +497,71 @@ export default function Bomboniere() {
             )}
 
             {/* BARRA INFERIOR */}
-            <div className="flex fixed bottom-0 w-full flex-col bg-white">
-                <div className="border-t border-[#a6a6a6] w-full flex"></div>
+            {filme && (
+                <div className="flex fixed bottom-0 w-full flex-col bg-white border-t border-[#a6a6a6]">
+                    <div className="flex flex-wrap mt-2 mb-2 ml-2 sm:ml-8 items-center gap-4">
 
-                <div className="mt-4 ml-2 sm:ml-8 mb-2 flex flex-wrap">
-
-                    {/* FILME */}
-                    <div className="flex flex-row">
-                        <div>
+                        <div className="flex flex-row items-center gap-4">
                             <img
-                                src="/interestelar.jpeg"
-                                alt=""
-                                className="h-[90px] sm:h-[120px] rounded-md"
+                                src={filme.foto_capa ? `http://localhost:3333/${filme.foto_capa}` : "/placeholder.jpg"}
+                                alt={filme.nome_filme}
+                                className="h-[90px] sm:h-[120px] rounded-md object-cover"
                             />
-                        </div>
 
-                        <div className="ml-5">
-                            <p className="font-bold flex items-center">
-                                Interestelar
-                                <div className="bg-[#008000] rounded-lg w-6 h-6 flex items-center justify-center text-white font-bold ml-2">
-                                    L
+                            <div className="flex flex-col">
+                                <div className="flex items-center font-bold">
+                                    {filme.nome_filme}
+
+                                    <div
+                                        className="rounded-lg w-8 h-8 flex items-center justify-center text-white font-bold ml-2"
+                                        style={{ backgroundColor: getClassColor(filme.classificacao) }}
+                                    >
+                                        {(filme.classificacao || "L").toString().replace(/\D/g, "") || "L"}
+                                    </div>
                                 </div>
+
+                                <span className="text-sm text-[#545454]">{filme.genero || "Gênero não informado"}</span>
+                                <span className="text-sm text-[#545454]">{filme.duracao ? `${filme.duracao} min` : "Duração não informada"}</span>
+                            </div>
+                        </div>
+
+                        <div className="border-r border-[#a6a6a6] h-24 mx-6" />
+
+                        <div className="flex flex-col">
+                            <span className="font-bold">Sessão</span>
+
+                            <p className="text-sm text-[#545454] flex items-center">
+                                <CalendarClock className="w-4 h-4 mr-1" />
+                                {formatDateSafe(dataSessao)} às {horarioSessao?.slice(0, 5)}
                             </p>
-                            <p className="text-sm text-[#545454]">Ficção</p>
-                            <p className="text-sm text-[#545454]">120min</p>
-                        </div>
-                    </div>
 
-                    <div className="border-r border-[#a6a6a6] h-24 flex mr-3 ml-6 self-center"></div>
+                            <span className="text-sm text-[#545454] flex items-center mt-1">
+                                <MapPinned className="w-4 h-4 mr-1" />
+                                CineAJL, {idSala}
+                            </span>
 
-                    {/* SESSÃO */}
-                    <div className="flex flex-col">
-                        <p className="font-bold">Sessão</p>
-                        <p className="text-sm text-[#545454] flex items-center">
-                            <CalendarClock className="w-4 h-4 mr-1" />
-                            02/10/2025 às 19h30
-                        </p>
-                        <p className="text-sm text-[#545454] flex items-center mt-1">
-                            <MapPinned className="w-4 h-4 mr-1" />
-                            CineAJL, sala 1
-                        </p>
-                        <div className="flex mt-1">
-                            <div className="bg-[#a60301] rounded-lg w-7 h-6 flex items-center justify-center text-white font-bold mr-1">
-                                3D
-                            </div>
-                            <div className="bg-[#ffd900] rounded-lg w-8 h-6 flex items-center justify-center text-white font-bold">
-                                DUB
+                            <div className="flex mt-1 gap-1">
+                                <div className="bg-[#a60301] rounded-lg w-7 h-6 flex items-center justify-center text-white font-bold">
+                                    2D
+                                </div>
+                                <div className="bg-[#ffd900] rounded-lg w-8 h-6 flex items-center justify-center text-white font-bold">
+                                    DUB
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="border-r border-[#a6a6a6] h-24 flex mr-3 ml-6 self-center"></div>
+                        <div className="border-l border-[#a6a6a6] h-24 mx-6" />
 
-                    {/* ASSENTOS */}
-                    <div className="flex flex-col">
-                        <p className="font-bold">Assentos escolhidos</p>
-                        <p className="text-sm text-[#a60301]">C3</p>
-                    </div>
+                        <div className="flex flex-col">
+                            <span className="font-bold">Assentos selecionados</span>
+                            <span className="text-sm text-[#545454]">
+                                {selected.length > 0 ? selected.join(", ") : "Nenhum"}
+                            </span>
+                        </div>
 
-                    <div className="border-r border-[#a6a6a6] h-24 flex mr-3 ml-6 self-center"></div>
-
-                    {/* INGRESSOS */}
-                    <div className="flex flex-col">
-                        <p className="font-bold">Tipos de ingresso</p>
-                        <p className="text-sm">
-                            1x Sala 01 - Preço único R$13,00
-                        </p>
-                        <p className="text-sm text-[#00a44d] font-bold mt-2">
-                            Total R$13,00
-                        </p>
                     </div>
                 </div>
-            </div>
+            )}
         </div >
     );
 }
